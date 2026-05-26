@@ -6,6 +6,8 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LandingHero } from '@/components/layout/LandingHero';
+import { StandingsBoard } from '@/components/StandingsBoard';
+import { TopScorersTable } from '@/components/TopScorersTable';
 
 export const dynamic = 'force-dynamic';
 
@@ -136,6 +138,20 @@ export default async function Home() {
                 No hay partidos programados para las próximas 48 horas.
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Statistics Section */}
+        <section className="space-y-6 pt-6 border-t border-border/50">
+          <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex-1">
+              <StandingsBoard />
+            </div>
+            <div className="w-full lg:w-[350px]">
+              <div className="py-8">
+                <TopScorersTable />
+              </div>
+            </div>
           </div>
         </section>
       </main>

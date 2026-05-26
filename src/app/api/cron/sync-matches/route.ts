@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// We use the service role key to bypass RLS in background jobs
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!; // IMPORTANT: You need to add this to .env
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
 export async function GET(request: Request) {
+  // We use the service role key to bypass RLS in background jobs
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  // Fallback to empty string at build time if not present, to prevent build crash if somehow called
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''; 
+
+  // Initialize inside the request to avoid build-time errors when env vars are missing
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
   // 1. Authenticate the cron job request
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get('secret');
