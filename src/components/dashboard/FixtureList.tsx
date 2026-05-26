@@ -116,8 +116,8 @@ export function FixtureList({
                 awayTeam={match.away_team?.name || 'Por definir'} 
                 homeFlag={match.home_team?.flag || '❓'} 
                 awayFlag={match.away_team?.flag || '❓'} 
-                matchDate={date.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })} 
-                matchTime={date.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} 
+                matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
+                matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} 
                 groupName={match.phase.toUpperCase()} 
                 status={match.status} 
                 userId={userId}

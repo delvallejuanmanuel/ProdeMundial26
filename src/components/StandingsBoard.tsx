@@ -1,128 +1,60 @@
 import React from 'react';
 import { GroupStandingsTable, GroupData } from './GroupStandingsTable';
+import { createClient } from '@/utils/supabase/server';
 
-// Mock data to illustrate the UI based on the image with 12 groups
-const createEmptyTeam = (pos: number, name: string, flag: string) => ({
-  pos, flag, name, played: 0, won: 0, drawn: 0, lost: 0, goalDiff: 0, points: 0
-});
+export const StandingsBoard = async () => {
+  const supabase = await createClient();
 
-const MOCK_GROUPS: GroupData[] = [
-  {
-    name: 'Grupo A',
-    teams: [
-      createEmptyTeam(1, 'México', 'https://api.promiedos.com.ar/images/team/fbag/1'),
-      createEmptyTeam(2, 'Sudáfrica', 'https://api.promiedos.com.ar/images/team/fbad/1'),
-      createEmptyTeam(3, 'Corea del Sur', 'https://api.promiedos.com.ar/images/team/cdid/1'),
-      createEmptyTeam(4, 'República Checa', 'https://api.promiedos.com.ar/images/team/faea/1'),
-    ]
-  },
-  {
-    name: 'Grupo B',
-    teams: [
-      createEmptyTeam(1, 'Canadá', 'https://api.promiedos.com.ar/images/team/cdii/1'),
-      createEmptyTeam(2, 'Bosnia Herzegovina', 'https://api.promiedos.com.ar/images/team/faei/1'),
-      createEmptyTeam(3, 'Qatar', 'https://api.promiedos.com.ar/images/team/fahj/1'),
-      createEmptyTeam(4, 'Suiza', 'https://api.promiedos.com.ar/images/team/fadc/1'),
-    ]
-  },
-  {
-    name: 'Grupo C',
-    teams: [
-      createEmptyTeam(1, 'Brasil', 'https://api.promiedos.com.ar/images/team/cdhj/1'),
-      createEmptyTeam(2, 'Marruecos', 'https://api.promiedos.com.ar/images/team/fajd/1'),
-      createEmptyTeam(3, 'Haití', 'https://api.promiedos.com.ar/images/team/fecc/1'),
-      createEmptyTeam(4, 'Escocia', 'https://api.promiedos.com.ar/images/team/fagj/1'),
-    ]
-  },
-  {
-    name: 'Grupo D',
-    teams: [
-      createEmptyTeam(1, 'Estados Unidos', 'https://api.promiedos.com.ar/images/team/cdij/1'),
-      createEmptyTeam(2, 'Paraguay', 'https://api.promiedos.com.ar/images/team/faha/1'),
-      createEmptyTeam(3, 'Australia', 'https://api.promiedos.com.ar/images/team/cdia/1'),
-      createEmptyTeam(4, 'Turquía', 'https://api.promiedos.com.ar/images/team/faeh/1'),
-    ]
-  },
-  {
-    name: 'Grupo E',
-    teams: [
-      createEmptyTeam(1, 'Alemania', 'https://api.promiedos.com.ar/images/team/cdhc/1'),
-      createEmptyTeam(2, 'Curazao', 'https://api.promiedos.com.ar/images/team/cedjh/1'),
-      createEmptyTeam(3, 'Costa de Marfil', 'https://api.promiedos.com.ar/images/team/cdif/1'),
-      createEmptyTeam(4, 'Ecuador', 'https://api.promiedos.com.ar/images/team/fahf/1'),
-    ]
-  },
-  {
-    name: 'Grupo F',
-    teams: [
-      createEmptyTeam(1, 'Países Bajos', 'https://api.promiedos.com.ar/images/team/cdhh/1'),
-      createEmptyTeam(2, 'Japón', 'https://api.promiedos.com.ar/images/team/cdic/1'),
-      createEmptyTeam(3, 'Suecia', 'https://api.promiedos.com.ar/images/team/cdhb/1'),
-      createEmptyTeam(4, 'Túnez', 'https://api.promiedos.com.ar/images/team/fbae/1'),
-    ]
-  },
-  {
-    name: 'Grupo G',
-    teams: [
-      createEmptyTeam(1, 'Bélgica', 'https://api.promiedos.com.ar/images/team/cdhd/1'),
-      createEmptyTeam(2, 'Egipto', 'https://api.promiedos.com.ar/images/team/fbaa/1'),
-      createEmptyTeam(3, 'Irán', 'https://api.promiedos.com.ar/images/team/fajb/1'),
-      createEmptyTeam(4, 'Nueva Zelanda', 'https://api.promiedos.com.ar/images/team/cdjb/1'),
-    ]
-  },
-  {
-    name: 'Grupo H',
-    teams: [
-      createEmptyTeam(1, 'España', 'https://api.promiedos.com.ar/images/team/fafa/1'),
-      createEmptyTeam(2, 'Cabo Verde', 'https://api.promiedos.com.ar/images/team/febb/1'),
-      createEmptyTeam(3, 'Arabia Saudita', 'https://api.promiedos.com.ar/images/team/faih/1'),
-      createEmptyTeam(4, 'Uruguay', 'https://api.promiedos.com.ar/images/team/fahd/1'),
-    ]
-  },
-  {
-    name: 'Grupo I',
-    teams: [
-      createEmptyTeam(1, 'Francia', 'https://api.promiedos.com.ar/images/team/fagb/1'),
-      createEmptyTeam(2, 'Senegal', 'https://api.promiedos.com.ar/images/team/fbac/1'),
-      createEmptyTeam(3, 'Irak', 'https://api.promiedos.com.ar/images/team/fahi/1'),
-      createEmptyTeam(4, 'Noruega', 'https://api.promiedos.com.ar/images/team/cdhg/1'),
-    ]
-  },
-  {
-    name: 'Grupo J',
-    teams: [
-      createEmptyTeam(1, 'Argentina', 'https://api.promiedos.com.ar/images/team/cdhi/1'),
-      createEmptyTeam(2, 'Argelia', 'https://api.promiedos.com.ar/images/team/fbaj/1'),
-      createEmptyTeam(3, 'Austria', 'https://api.promiedos.com.ar/images/team/fafj/1'),
-      createEmptyTeam(4, 'Jordania', 'https://api.promiedos.com.ar/images/team/faid/1'),
-    ]
-  },
-  {
-    name: 'Grupo K',
-    teams: [
-      createEmptyTeam(1, 'Portugal', 'https://api.promiedos.com.ar/images/team/faci/1'),
-      createEmptyTeam(2, 'Jamaica', 'https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Jamaica.svg'),
-      createEmptyTeam(3, 'Uzbekistán', 'https://api.promiedos.com.ar/images/team/faif/1'),
-      createEmptyTeam(4, 'Colombia', 'https://api.promiedos.com.ar/images/team/fahb/1'),
-    ]
-  },
-  {
-    name: 'Grupo L',
-    teams: [
-      createEmptyTeam(1, 'Inglaterra', 'https://api.promiedos.com.ar/images/team/fafe/1'),
-      createEmptyTeam(2, 'Croacia', 'https://api.promiedos.com.ar/images/team/faff/1'),
-      createEmptyTeam(3, 'Ghana', 'https://api.promiedos.com.ar/images/team/faje/1'),
-      createEmptyTeam(4, 'Panamá', 'https://api.promiedos.com.ar/images/team/febe/1'),
-    ]
+  const { data: standingsData, error } = await supabase
+    .from('v_group_standings')
+    .select('*')
+    .order('group_name', { ascending: true })
+    .order('points', { ascending: false })
+    .order('goal_diff', { ascending: false })
+    .order('goals_for', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching standings:', error);
+    return <div className="p-4 text-center text-muted-foreground border border-dashed border-border/50 rounded-xl">Error cargando posiciones.</div>;
   }
-];
 
-export const StandingsBoard: React.FC = () => {
+  // Group by group_name
+  const groupedData: Record<string, GroupData> = {};
+
+  (standingsData || []).forEach((row) => {
+    if (!groupedData[row.group_name]) {
+      groupedData[row.group_name] = {
+        name: row.group_name,
+        teams: []
+      };
+    }
+
+    groupedData[row.group_name].teams.push({
+      pos: groupedData[row.group_name].teams.length + 1,
+      flag: row.flag,
+      name: row.name,
+      played: row.played,
+      won: row.won,
+      drawn: row.drawn,
+      lost: row.lost,
+      goalDiff: row.goal_diff,
+      points: row.points
+    });
+  });
+
+  const groups = Object.values(groupedData);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
-      {MOCK_GROUPS.map(group => (
-        <GroupStandingsTable key={group.name} group={group} />
-      ))}
+      {groups.length > 0 ? (
+        groups.map((group) => (
+          <GroupStandingsTable key={group.name} group={group} />
+        ))
+      ) : (
+        <div className="col-span-full text-center py-8 text-muted-foreground border border-dashed border-border/50 rounded-xl">
+          No hay posiciones disponibles aún.
+        </div>
+      )}
     </div>
   );
 };

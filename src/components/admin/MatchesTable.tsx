@@ -127,7 +127,7 @@ export function MatchesTable() {
                   <tr key={match.id} className="border-b border-border/20 hover:bg-muted/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="font-bold">{match.phase}</div>
-                      <div className="text-xs text-muted-foreground">{date.toLocaleDateString('es-AR')} {date.toLocaleTimeString('es-AR', { hour: '2-digit', minute:'2-digit' })}</div>
+                      <div className="text-xs text-muted-foreground">{date.toLocaleDateString('es-AR', { timeZone: 'UTC' })} {date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute:'2-digit' })}</div>
                     </td>
                     <td className="px-4 py-3 text-right font-medium">
                       {match.home_team?.name || 'TBD'} {match.home_team?.flag}
