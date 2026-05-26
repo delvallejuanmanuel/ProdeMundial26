@@ -94,7 +94,7 @@ export function SpecialResultsForm() {
               className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
             >
               <option value="">Seleccionar...</option>
-              {teams.map(t => <option key={t.id} value={t.id}>{t.flag} {t.name}</option>)}
+              {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
 
@@ -109,7 +109,7 @@ export function SpecialResultsForm() {
               className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
             >
               <option value="">Seleccionar...</option>
-              {teams.map(t => <option key={t.id} value={t.id}>{t.flag} {t.name}</option>)}
+              {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
 
@@ -139,7 +139,7 @@ export function SpecialResultsForm() {
               className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
             >
               <option value="">Seleccionar...</option>
-              {teams.map(t => <option key={t.id} value={t.id}>{t.flag} {t.name}</option>)}
+              {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
         </div>

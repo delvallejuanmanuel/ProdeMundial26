@@ -104,6 +104,7 @@ ALTER TABLE public.special_predictions ENABLE ROW LEVEL SECURITY;
 -- Políticas de Seguridad (RLS)
 -- Todos pueden ver perfiles, equipos, jugadores, partidos y leaderboard
 CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Users can update their own profile." ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 CREATE POLICY "Teams are viewable by everyone." ON public.teams FOR SELECT USING (true);
 CREATE POLICY "Players are viewable by everyone." ON public.players FOR SELECT USING (true);
 CREATE POLICY "Matches are viewable by everyone." ON public.matches FOR SELECT USING (true);
@@ -127,6 +128,11 @@ CREATE POLICY "Users can update predictions if match is pending." ON public.pred
   auth.uid() = user_id AND 
   EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status = 'pending')
 );
+
+-- Políticas para Predicciones Especiales
+CREATE POLICY "Users can view all special predictions." ON public.special_predictions FOR SELECT USING (true);
+CREATE POLICY "Users can insert their own special predictions." ON public.special_predictions FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can update their own special predictions." ON public.special_predictions FOR UPDATE TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- Trigger para crear perfil automáticamente al registrarse en Auth
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -159,7 +165,10 @@ ALTER TABLE public.global_chat_messages ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view chat messages" ON public.global_chat_messages FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can insert chat messages" ON public.global_chat_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
--- Para habilitar Realtime en esta tabla, ejecutar en Supabase SQL Editor:
--- BEGIN; DROP PUBLICATION IF EXISTS supabase_realtime; CREATE PUBLICATION supabase_realtime; COMMIT;
--- ALTER PUBLICATION supabase_realtime ADD TABLE global_chat_messages;
+-- Habilitar Realtime para el chat global
+BEGIN;
+DROP PUBLICATION IF EXISTS supabase_realtime;
+CREATE PUBLICATION supabase_realtime;
+COMMIT;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.global_chat_messages;
 

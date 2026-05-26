@@ -13,13 +13,18 @@ export async function updateNickname(formData: FormData) {
 
   const nickname = formData.get('nickname') as string;
 
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from('profiles')
     .update({ nickname })
-    .eq('id', user.id);
+    .eq('id', user.id)
+    .select('id', { count: 'exact' });
 
   if (error) {
     throw new Error('Error al actualizar el apodo');
+  }
+
+  if (count === 0 || count === null) {
+    throw new Error('No se pudo actualizar el apodo. Violación de permisos o perfil no encontrado.');
   }
 
   revalidatePath('/perfil');

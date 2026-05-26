@@ -123,8 +123,8 @@ export function MatchCard({
           
           {/* Home Team */}
           <div className="flex flex-col items-center space-y-2 w-1/3 text-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-secondary text-2xl border-2 border-border/50 shadow-inner">
-              {homeFlag}
+            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-secondary text-2xl border-2 border-border/50 shadow-inner overflow-hidden">
+              {homeFlag.startsWith('http') ? <img src={homeFlag} alt={homeTeam} className="w-full h-full object-cover" /> : homeFlag}
             </div>
             <span className="font-bold text-sm leading-tight">{homeTeam}</span>
           </div>
@@ -156,8 +156,8 @@ export function MatchCard({
 
           {/* Away Team */}
           <div className="flex flex-col items-center space-y-2 w-1/3 text-center">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-secondary text-2xl border-2 border-border/50 shadow-inner">
-              {awayFlag}
+            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-secondary text-2xl border-2 border-border/50 shadow-inner overflow-hidden">
+              {awayFlag.startsWith('http') ? <img src={awayFlag} alt={awayTeam} className="w-full h-full object-cover" /> : awayFlag}
             </div>
             <span className="font-bold text-sm leading-tight">{awayTeam}</span>
           </div>
