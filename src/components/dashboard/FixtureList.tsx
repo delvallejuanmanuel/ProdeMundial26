@@ -7,7 +7,7 @@ import { Filter } from 'lucide-react';
 interface Match {
   id: number;
   kickoff_time: string;
-  status: string;
+  status: 'pending' | 'in_play' | 'finished';
   phase: string;
   home_score: number | null;
   away_score: number | null;
