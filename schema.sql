@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   name text,
   email text,
+  nickname text,
   paid_groups boolean DEFAULT false,
   paid_knockouts boolean DEFAULT false,
   created_at timestamptz DEFAULT now()
@@ -80,6 +81,7 @@ special_points AS (
 SELECT 
   p.id as user_id,
   p.name,
+  p.nickname,
   p.paid_groups,
   p.paid_knockouts,
   COALESCE(sp.match_points, 0) as match_points,

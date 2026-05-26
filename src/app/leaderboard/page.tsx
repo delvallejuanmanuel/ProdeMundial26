@@ -16,9 +16,9 @@ export default async function LeaderboardPage() {
 
   // For MVP, if no real users are found, we'll mock a few to show the UI
   const users = leaderboard && leaderboard.length > 0 ? leaderboard : [
-    { user_id: '1', name: 'Leo', total_score: 120, exact_matches: 15, special_points: 30, paid_groups: true, paid_knockouts: true },
-    { user_id: '2', name: 'Matias', total_score: 95, exact_matches: 8, special_points: 15, paid_groups: true, paid_knockouts: false },
-    { user_id: '3', name: 'Sofia', total_score: 80, exact_matches: 6, special_points: 0, paid_groups: true, paid_knockouts: true },
+    { user_id: '1', name: 'Leo Messi', nickname: 'La Pulga', total_score: 120, exact_matches: 15, special_points: 30, paid_groups: true, paid_knockouts: true },
+    { user_id: '2', name: 'Matias', nickname: null, total_score: 95, exact_matches: 8, special_points: 15, paid_groups: true, paid_knockouts: false },
+    { user_id: '3', name: 'Sofia', nickname: 'Sofi', total_score: 80, exact_matches: 6, special_points: 0, paid_groups: true, paid_knockouts: true },
   ];
 
   return (
@@ -68,7 +68,7 @@ export default async function LeaderboardPage() {
                          <span className="pl-1">{index + 1}</span>}
                       </td>
                       <td className="px-4 py-3 font-medium flex items-center gap-2">
-                        <span className="truncate max-w-[120px] sm:max-w-xs">{user.name}</span>
+                        <span className="truncate max-w-[120px] sm:max-w-xs">{user.nickname || user.name}</span>
                         {isIneligible && (
                           <Badge variant="destructive" className="text-[10px] h-5 hidden md:flex items-center gap-1 shrink-0">
                             <AlertCircle className="w-3 h-3" /> Fuera de Premio

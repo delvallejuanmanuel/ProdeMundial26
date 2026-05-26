@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { User, CreditCard, ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, Phone, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { NicknameForm } from './NicknameForm';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,10 +53,12 @@ export default async function ProfilePage() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
               
               <div className="w-16 h-16 bg-secondary text-primary rounded-full flex items-center justify-center mb-4 text-2xl font-black border-2 border-primary/20">
-                {profile?.name?.charAt(0).toUpperCase() || 'U'}
+                {(profile?.nickname || profile?.name)?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <h2 className="text-xl font-bold">{profile?.name}</h2>
+              <h2 className="text-xl font-bold">{profile?.nickname ? `${profile.nickname} (${profile.name})` : profile?.name}</h2>
               <p className="text-sm text-muted-foreground mb-6">{profile?.email}</p>
+
+              <NicknameForm currentNickname={profile?.nickname} />
 
               <div className="space-y-4">
                 <div>

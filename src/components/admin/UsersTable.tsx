@@ -61,7 +61,10 @@ export function UsersTable() {
           <tbody>
             {users.map(user => (
               <tr key={user.id} className="border-b border-border/20 hover:bg-muted/50 transition-colors">
-                <td className="px-4 py-3 font-medium">{user.name || 'Sin Nombre'}</td>
+                <td className="px-4 py-3 font-medium">
+                  {user.name || 'Sin Nombre'}
+                  {user.nickname && <span className="block text-xs text-muted-foreground mt-0.5">Apodo: {user.nickname}</span>}
+                </td>
                 <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
                 <td className="px-4 py-3 text-center">
                   <Button 

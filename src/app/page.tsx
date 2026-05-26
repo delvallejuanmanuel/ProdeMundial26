@@ -48,7 +48,7 @@ export default async function Home() {
   // Fetch user profile to check payment status
   const { data: profile } = await supabase
     .from('profiles')
-    .select('paid_groups, paid_knockouts, is_admin')
+    .select('paid_groups, paid_knockouts, is_admin, name, nickname')
     .eq('id', user.id)
     .single();
 
@@ -84,7 +84,7 @@ export default async function Home() {
         {/* Welcome Section */}
         <section className="space-y-2">
           <h1 className="text-3xl font-black tracking-tight">
-            Hola, {user.user_metadata?.full_name || 'Participante'} 👋
+            Hola, {profile?.nickname || profile?.name || user.user_metadata?.full_name || 'Participante'} 👋
           </h1>
           <p className="text-muted-foreground">Aquí está el estado actual del torneo. ¡No olvides cargar tus pronósticos!</p>
         </section>
