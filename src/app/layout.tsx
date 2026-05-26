@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import GlobalChat from "@/components/GlobalChat";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -22,7 +23,10 @@ export default function RootLayout({
       lang="es"
       className={`${inter.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">{children}</body>
+      <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-primary selection:text-primary-foreground">
+        {children}
+        <GlobalChat />
+      </body>
     </html>
   );
 }

@@ -141,3 +141,25 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- ==========================================
+-- CHAT GLOBAL
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.global_chat_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+  content text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Enable RLS for Chat
+ALTER TABLE public.global_chat_messages ENABLE ROW LEVEL SECURITY;
+
+-- Chat Policies
+CREATE POLICY "Anyone can view chat messages" ON public.global_chat_messages FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can insert chat messages" ON public.global_chat_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+
+-- Para habilitar Realtime en esta tabla, ejecutar en Supabase SQL Editor:
+-- BEGIN; DROP PUBLICATION IF EXISTS supabase_realtime; CREATE PUBLICATION supabase_realtime; COMMIT;
+-- ALTER PUBLICATION supabase_realtime ADD TABLE global_chat_messages;
+

@@ -71,7 +71,7 @@ export default async function FixturePage() {
         </div>
 
         <FixtureList 
-          matches={matches || []} 
+          matches={(matches as any) || []} 
           predictions={predictions} 
           userId={user.id}
           hasPaidGroups={hasPaidGroups}
