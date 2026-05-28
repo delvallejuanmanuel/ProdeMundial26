@@ -151,10 +151,10 @@ export async function KnockoutBracket() {
     winner_by_penalties_team_id: m.winner_by_penalties_team_id,
     home_team_id: m.home_team_id,
     away_team_id: m.away_team_id,
-    home_name: m.t1?.name || null,
-    home_flag: m.t1?.flag || null,
-    away_name: m.t2?.name || null,
-    away_flag: m.t2?.flag || null,
+    home_name: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.name || null,
+    home_flag: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.flag || null,
+    away_name: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.name || null,
+    away_flag: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.flag || null,
   }));
 
   const getMatch = (id: number) => matches.find(m => m.id === id);
