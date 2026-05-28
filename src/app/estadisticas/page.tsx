@@ -2,6 +2,7 @@ import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { StandingsBoard } from '@/components/StandingsBoard';
 import { TopScorersTable } from '@/components/TopScorersTable';
+import { KnockoutBracket } from '@/components/KnockoutBracket';
 import { createClient } from '@/utils/supabase/server';
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +41,10 @@ export default async function EstadisticasPage() {
               <TopScorersTable />
             </div>
           </div>
+        </section>
+
+        <section className="pt-6 border-t border-border/50">
+          <KnockoutBracket />
         </section>
       </main>
     </div>

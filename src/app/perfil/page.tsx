@@ -2,7 +2,7 @@ import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
-import { User, CreditCard, ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, Phone, Info } from 'lucide-react';
+import { User, CreditCard, ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, Phone, Info, Trophy, Target, Medal, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { NicknameForm } from './NicknameForm';
@@ -27,6 +27,19 @@ export default async function ProfilePage() {
   const isAdmin = profile?.is_admin || false;
   const hasPaidGroups = profile?.paid_groups || false;
   const hasPaidKnockouts = profile?.paid_knockouts || false;
+
+  // Fetch leaderboard to calculate rank and get stats
+  const { data: leaderboard } = await supabase
+    .from('v_leaderboard')
+    .select('*')
+    .order('total_score', { ascending: false })
+    .order('exact_matches', { ascending: false })
+    .order('special_points', { ascending: false });
+
+  const userStats = leaderboard?.find(u => u.user_id === user.id);
+  const userRank = leaderboard?.findIndex(u => u.user_id === user.id) !== undefined && leaderboard!.findIndex(u => u.user_id === user.id) !== -1 
+    ? (leaderboard!.findIndex(u => u.user_id === user.id) + 1) 
+    : '-';
   
   // URL to generate MP QR using a generic public API for the alias text
   const mpAlias = "prode.mundial.2026";
@@ -57,6 +70,31 @@ export default async function ProfilePage() {
               </div>
               <h2 className="text-xl font-bold">{profile?.nickname ? `${profile.nickname} (${profile.name})` : profile?.name}</h2>
               <p className="text-sm text-muted-foreground mb-6">{profile?.email}</p>
+
+              {userStats && (
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="bg-background/50 border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                    <Hash className="w-5 h-5 text-primary mb-1" />
+                    <span className="text-2xl font-black">{userRank}</span>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Posición</span>
+                  </div>
+                  <div className="bg-background/50 border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                    <Trophy className="w-5 h-5 text-yellow-500 mb-1" />
+                    <span className="text-2xl font-black">{userStats.total_score}</span>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Puntos</span>
+                  </div>
+                  <div className="bg-background/50 border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                    <Target className="w-5 h-5 text-green-500 mb-1" />
+                    <span className="text-2xl font-black">{userStats.exact_matches}</span>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Plenos</span>
+                  </div>
+                  <div className="bg-background/50 border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center">
+                    <Medal className="w-5 h-5 text-purple-500 mb-1" />
+                    <span className="text-2xl font-black">{userStats.special_points}</span>
+                    <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Especiales</span>
+                  </div>
+                </div>
+              )}
 
               <NicknameForm currentNickname={profile?.nickname} />
 
