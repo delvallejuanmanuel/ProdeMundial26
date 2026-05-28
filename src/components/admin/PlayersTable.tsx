@@ -64,12 +64,10 @@ export function PlayersTable() {
     // Optimistic UI update
     setPlayers(players.map(p => p.id === playerId ? { ...p, goals: newGoals } : p));
 
-    const { error } = await supabase
-      .from('players')
-      .update({ goals: newGoals })
-      .eq('id', playerId);
-    
-    if (error) {
+    try {
+      const { updatePlayerGoalsAction } = await import('@/app/admin/actions');
+      await updatePlayerGoalsAction(playerId, newGoals);
+    } catch (error: any) {
       alert("Error al actualizar goles: " + error.message);
       // Revert on error
       fetchPlayers();

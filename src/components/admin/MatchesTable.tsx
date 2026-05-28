@@ -46,16 +46,15 @@ export function MatchesTable() {
 
   const handleSaveMatch = async (match: any) => {
     setSavingId(match.id);
-    const { error } = await supabase
-      .from('matches')
-      .update({
-        status: match.status,
-        home_score: match.home_score === '' ? null : match.home_score,
-        away_score: match.away_score === '' ? null : match.away_score,
-      })
-      .eq('id', match.id);
-    
-    if (error) {
+    try {
+      const { updateMatchAction } = await import('@/app/admin/actions');
+      await updateMatchAction(
+        match.id, 
+        match.status, 
+        match.home_score === '' ? null : match.home_score, 
+        match.away_score === '' ? null : match.away_score
+      );
+    } catch (error: any) {
       alert("Error al actualizar partido: " + error.message);
     }
     setSavingId(null);
