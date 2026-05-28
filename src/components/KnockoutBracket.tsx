@@ -83,7 +83,11 @@ function MatchNode({ match, side }: { match?: Match, side?: 'left' | 'right' }) 
         <div className="flex items-center justify-between px-2 py-1.5 border-b border-border/10">
           <div className="flex items-center gap-2 overflow-hidden">
             {match.home_flag ? (
-              <Image src={match.home_flag} alt={homeDisplay} width={16} height={16} className="rounded-sm object-cover" />
+              match.home_flag.startsWith('http') ? (
+                <img src={match.home_flag} alt={homeDisplay} width={16} height={16} className="rounded-sm object-cover" />
+              ) : (
+                <span className="text-xs leading-none">{match.home_flag}</span>
+              )
             ) : (
               <div className="w-4 h-4 bg-muted rounded-sm" />
             )}
@@ -98,7 +102,11 @@ function MatchNode({ match, side }: { match?: Match, side?: 'left' | 'right' }) 
         <div className="flex items-center justify-between px-2 py-1.5">
           <div className="flex items-center gap-2 overflow-hidden">
             {match.away_flag ? (
-              <Image src={match.away_flag} alt={awayDisplay} width={16} height={16} className="rounded-sm object-cover" />
+              match.away_flag.startsWith('http') ? (
+                <img src={match.away_flag} alt={awayDisplay} width={16} height={16} className="rounded-sm object-cover" />
+              ) : (
+                <span className="text-xs leading-none">{match.away_flag}</span>
+              )
             ) : (
               <div className="w-4 h-4 bg-muted rounded-sm" />
             )}
