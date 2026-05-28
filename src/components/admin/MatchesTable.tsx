@@ -81,29 +81,53 @@ export function MatchesTable() {
     }
   };
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredMatches = matches.filter(match => {
+    if (!searchTerm) return true;
+    const lower = searchTerm.toLowerCase();
+    return (
+      (match.home_team?.name && match.home_team.name.toLowerCase().includes(lower)) ||
+      (match.away_team?.name && match.away_team.name.toLowerCase().includes(lower)) ||
+      (match.phase && match.phase.toLowerCase().includes(lower))
+    );
+  });
+
   if (isLoading) {
     return <div className="flex justify-center py-10"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
 
   return (
     <div className="space-y-4">
-      <div className="bg-card p-4 rounded-xl border border-border/50 space-y-3">
-        <div className="flex justify-between items-center">
+      <div className="bg-card p-4 rounded-xl border border-border/50 space-y-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h3 className="font-bold">Calculadora de Puntajes</h3>
             <p className="text-sm text-muted-foreground">Ejecuta esto después de finalizar un partido para repartir los puntos.</p>
           </div>
-          <Button onClick={handleCalculatePoints} disabled={isCalculating} variant="secondary" className="font-bold border-border/50">
+          <Button onClick={handleCalculatePoints} disabled={isCalculating} variant="secondary" className="font-bold border-border/50 shrink-0">
             {isCalculating ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Calculando...</> : 'Calcular Puntajes Ahora'}
           </Button>
         </div>
         {calcResult && (
           <div className="text-sm font-medium p-2 rounded-lg bg-muted/50">{calcResult}</div>
         )}
-        <div className="text-xs text-muted-foreground flex gap-4 border-t border-border/20 pt-2">
-          <span><strong className="text-primary">3 pts</strong> = Resultado exacto</span>
-          <span><strong className="text-primary">2 pts</strong> = Diferencia de goles</span>
-          <span><strong className="text-primary">1 pt</strong> = Acertar ganador/empate</span>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-t border-border/20 pt-4">
+          <div className="text-xs text-muted-foreground flex flex-wrap gap-4">
+            <span><strong className="text-primary">3 pts</strong> = Resultado exacto</span>
+            <span><strong className="text-primary">2 pts</strong> = Diferencia de goles</span>
+            <span><strong className="text-primary">1 pt</strong> = Acertar ganador/empate</span>
+          </div>
+          
+          <div className="relative w-full md:w-72 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <Input 
+              placeholder="Buscar equipo o fase..." 
+              className="pl-9 bg-background/50"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -121,7 +145,7 @@ export function MatchesTable() {
               </tr>
             </thead>
             <tbody>
-              {matches.map(match => {
+              {filteredMatches.length > 0 ? filteredMatches.map(match => {
                 const date = new Date(match.kickoff_time);
                 return (
                   <tr key={match.id} className="border-b border-border/20 hover:bg-muted/50 transition-colors">
@@ -188,7 +212,13 @@ export function MatchesTable() {
                     </td>
                   </tr>
                 );
-              })}
+              }) : (
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-muted-foreground">
+                    No se encontraron partidos.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
