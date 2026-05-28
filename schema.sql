@@ -151,17 +151,17 @@ CREATE POLICY "Users can view other predictions if match is locked." ON public.p
   EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status != 'pending')
 );
 
--- Predicciones: los usuarios pueden crear o actualizar sus predicciones SI el partido está 'pending'
+-- Predicciones: los usuarios pueden crear o actualizar sus predicciones SI el partido está 'pending' y falta más de 1 hora
 CREATE POLICY "Users can insert predictions if match is pending." ON public.predictions FOR INSERT TO authenticated WITH CHECK (
   auth.uid() = user_id AND 
-  EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status = 'pending')
+  EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status = 'pending' AND m.kickoff_time > (now() + interval '1 hour'))
 );
 CREATE POLICY "Users can update predictions if match is pending." ON public.predictions FOR UPDATE TO authenticated USING (
   auth.uid() = user_id AND 
-  EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status = 'pending')
+  EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status = 'pending' AND m.kickoff_time > (now() + interval '1 hour'))
 ) WITH CHECK (
   auth.uid() = user_id AND 
-  EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status = 'pending')
+  EXISTS (SELECT 1 FROM public.matches m WHERE m.id = match_id AND m.status = 'pending' AND m.kickoff_time > (now() + interval '1 hour'))
 );
 
 -- Políticas para Predicciones Especiales

@@ -24,6 +24,7 @@ interface MatchCardProps {
   actualHomeScore?: number | null;
   actualAwayScore?: number | null;
   awardedPoints?: number | null;
+  kickoffTime?: string;
 }
 
 export function MatchCard({
@@ -42,9 +43,12 @@ export function MatchCard({
   hasPaid = false,
   actualHomeScore = null,
   actualAwayScore = null,
-  awardedPoints = null
+  awardedPoints = null,
+  kickoffTime = ''
 }: MatchCardProps) {
-  const isLocked = status !== 'pending' || !hasPaid;
+  // Lock logic: 1 hour before kickoff
+  const isTimeLocked = kickoffTime ? new Date(kickoffTime).getTime() - new Date().getTime() <= 60 * 60 * 1000 : false;
+  const isLocked = status !== 'pending' || !hasPaid || isTimeLocked;
   
   const [homeScore, setHomeScore] = useState<number | string>(initialHomeScore ?? '');
   const [awayScore, setAwayScore] = useState<number | string>(initialAwayScore ?? '');
@@ -110,6 +114,9 @@ export function MatchCard({
           )}
           {status === 'finished' && (
             <Badge variant="secondary" className="text-xs">Finalizado</Badge>
+          )}
+          {status === 'pending' && isTimeLocked && (
+            <Badge variant="destructive" className="text-xs">Bloqueado</Badge>
           )}
         </div>
         <div className="text-xs font-semibold text-muted-foreground text-right">
@@ -180,7 +187,7 @@ export function MatchCard({
           </div>
         )}
 
-        {(!isLocked && hasPaid) && (
+        {(!isLocked && hasPaid) ? (
           <div className="mt-6">
             <Button 
               onClick={handleSave}
@@ -199,6 +206,10 @@ export function MatchCard({
                 'Guardar Pronóstico'
               )}
             </Button>
+          </div>
+        ) : (status === 'pending' && isTimeLocked) && (
+          <div className="mt-4 pt-2 border-t border-border/20 text-center">
+            <p className="text-xs text-muted-foreground font-semibold">El tiempo para cargar el pronóstico de este partido ha finalizado.</p>
           </div>
         )}
       </CardContent>

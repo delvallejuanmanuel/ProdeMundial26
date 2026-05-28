@@ -128,6 +128,7 @@ export default async function Home() {
                     awardedPoints={userPrediction?.awarded_points}
                     initialHomeScore={userPrediction?.predicted_home_score}
                     initialAwayScore={userPrediction?.predicted_away_score}
+                    kickoffTime={match.kickoff_time}
                   />
                 );
               })
