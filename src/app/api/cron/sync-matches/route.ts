@@ -16,6 +16,11 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get('secret');
 
+  console.log('--- debug cron ---');
+  console.log('Secret query param:', secret ? `defined (len: ${secret.length})` : 'NOT defined');
+  console.log('CRON_SECRET env var:', process.env.CRON_SECRET ? `defined (len: ${process.env.CRON_SECRET.length})` : 'NOT defined');
+  console.log('Are they equal?:', secret === process.env.CRON_SECRET);
+
   if (secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
