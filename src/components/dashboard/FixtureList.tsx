@@ -13,6 +13,8 @@ interface Match {
   away_score: number | null;
   home_team: { name: string; flag: string } | null;
   away_team: { name: string; flag: string } | null;
+  home_team_placeholder?: string | null;
+  away_team_placeholder?: string | null;
 }
 
 interface Prediction {
@@ -112,8 +114,8 @@ export function FixtureList({
               <MatchCard 
                 key={match.id}
                 matchId={match.id}
-                homeTeam={match.home_team?.name || 'Por definir'} 
-                awayTeam={match.away_team?.name || 'Por definir'} 
+                homeTeam={match.home_team?.name || match.home_team_placeholder || 'Por definir'} 
+                awayTeam={match.away_team?.name || match.away_team_placeholder || 'Por definir'} 
                 homeFlag={match.home_team?.flag || '❓'} 
                 awayFlag={match.away_team?.flag || '❓'} 
                 matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 

@@ -8,8 +8,12 @@ interface Match {
   kickoff_time: string;
   home_team_id: number | null;
   away_team_id: number | null;
+  home_team_placeholder?: string | null;
+  away_team_placeholder?: string | null;
   home_score: number | null;
   away_score: number | null;
+  t1: { name: string; flag: string } | null;
+  t2: { name: string; flag: string } | null;
   winner_by_penalties_team_id: number | null;
   status: string;
   home_name: string | null;
@@ -129,8 +133,9 @@ export async function KnockoutBracket() {
     .select(`
       id, phase, kickoff_time, status, home_score, away_score, winner_by_penalties_team_id,
       home_team_id, away_team_id,
-      t1:home_team_id(name, flag),
-      t2:away_team_id(name, flag)
+      home_team_placeholder, away_team_placeholder,
+      t1:teams!home_team_id(name, flag),
+      t2:teams!away_team_id(name, flag)
     `)
     .gte('id', 73)
     .order('id', { ascending: true });
@@ -151,10 +156,12 @@ export async function KnockoutBracket() {
     winner_by_penalties_team_id: m.winner_by_penalties_team_id,
     home_team_id: m.home_team_id,
     away_team_id: m.away_team_id,
-    home_name: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.name || null,
-    home_flag: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.flag || null,
-    away_name: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.name || null,
-    away_flag: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.flag || null,
+    home_name: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.name || m.home_team_placeholder || 'Por definir',
+    home_flag: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.flag || 'https://flagcdn.com/w40/xx.png',
+    away_name: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.name || m.away_team_placeholder || 'Por definir',
+    away_flag: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.flag || 'https://flagcdn.com/w40/xx.png',
+    t1: Array.isArray(m.t1) ? m.t1[0] : m.t1,
+    t2: Array.isArray(m.t2) ? m.t2[0] : m.t2
   }));
 
   const getMatch = (id: number) => matches.find(m => m.id === id);

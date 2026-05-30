@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import * as cheerio from 'cheerio'; // We don't strictly need cheerio if we just regex match the script, but we can use regex.
 
 export async function GET(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;

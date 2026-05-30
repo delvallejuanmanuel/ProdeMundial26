@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { Bell } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
 import {
   DropdownMenu,
@@ -59,16 +58,14 @@ export function NotificationBell() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative outline-none">
-          <Bell className="h-5 w-5" />
-          {hasNotifications && (
-            <>
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-primary rounded-full animate-ping"></span>
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-primary rounded-full"></span>
-            </>
-          )}
-        </Button>
+      <DropdownMenuTrigger className="relative inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground outline-none">
+        <Bell className="h-5 w-5" />
+        {hasNotifications && (
+          <>
+            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-ping"></span>
+            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+          </>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-72 max-h-96 overflow-y-auto">
         <DropdownMenuLabel>Tus aciertos (Últimas 48hs)</DropdownMenuLabel>

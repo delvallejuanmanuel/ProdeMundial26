@@ -45,7 +45,9 @@ export default async function Home() {
       home_score,
       away_score,
       home_team:teams!home_team_id (name, flag),
-      away_team:teams!away_team_id (name, flag)
+      away_team:teams!away_team_id (name, flag),
+      home_team_placeholder,
+      away_team_placeholder
     `)
     .gte('kickoff_time', startDate.toISOString())
     .lte('kickoff_time', next48h.toISOString())
@@ -135,8 +137,8 @@ export default async function Home() {
                   <MatchCard 
                     key={match.id}
                     matchId={match.id}
-                    homeTeam={match.home_team?.name || 'Por definir'} 
-                    awayTeam={match.away_team?.name || 'Por definir'} 
+                    homeTeam={match.home_team?.name || match.home_team_placeholder || 'Por definir'} 
+                    awayTeam={match.away_team?.name || match.away_team_placeholder || 'Por definir'} 
                     homeFlag={match.home_team?.flag || '❓'} 
                     awayFlag={match.away_team?.flag || '❓'} 
                     matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
