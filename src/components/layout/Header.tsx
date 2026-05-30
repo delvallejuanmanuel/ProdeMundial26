@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Menu, User, Bell, ShieldAlert } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { NotificationBell } from './NotificationBell';
 
 interface HeaderProps {
   isAdmin?: boolean;
@@ -60,11 +61,7 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
                 <ShieldAlert className="h-5 w-5" />
               </Link>
             )}
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-primary rounded-full animate-ping"></span>
-              <span className="absolute top-2 right-2.5 w-2 h-2 bg-primary rounded-full"></span>
-            </Button>
+            <NotificationBell />
             <Link href="/perfil" className={buttonVariants({ variant: "outline", className: "hidden sm:flex gap-2 rounded-full border-border/50 bg-secondary/50" })}>
               <User className="h-4 w-4" />
               <span>Mi Perfil</span>

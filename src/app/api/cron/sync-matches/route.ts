@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import * as cheerio from 'cheerio'; // We don't strictly need cheerio if we just regex match the script, but we can use regex.
 
 export async function GET(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || ''; 
-  const apiKey = process.env.API_FOOTBALL_KEY;
 
-  if (!supabaseUrl || !supabaseServiceKey || !apiKey) {
+  if (!supabaseUrl || !supabaseServiceKey) {
     return NextResponse.json({ error: 'Faltan variables de entorno' }, { status: 500 });
   }
 
@@ -16,90 +16,101 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const secret = searchParams.get('secret');
 
-  if (secret !== process.env.CRON_SECRET) {
+  if (secret !== process.env.CRON_SECRET && process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
 
   try {
-    // 2. Fetch matches from API-Football
-    // Usamos League 1 (Mundial). Para producción deberíamos pedir los de hoy: `date=${today}`
-    // Pero como estamos probando o si queremos forzar actualización general, podemos dejarlo fijo en la temporada.
-    const today = new Date().toISOString().split('T')[0];
+    // 2. Fetch data from Promiedos
+    const PROMIEDOS_URL = 'https://www.promiedos.com.ar/league/fifa-world-cup/fjda'; // 2022 World Cup URL for testing
+    const response = await fetch(PROMIEDOS_URL, { cache: 'no-store' });
+    const html = await response.text();
     
-    // NOTA: Para el Mundial 2026, usar season=2026. 
-    // Para no exceder los límites de la API, pedimos solo los partidos de HOY.
-    const response = await fetch(`https://v3.football.api-sports.io/fixtures?league=1&season=2026&date=${today}`, {
-      headers: {
-        'x-apisports-key': apiKey,
-      }
-    });
+    // Extract NEXT_DATA
+    const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/);
+    if (!match) throw new Error('No NEXT_DATA found in Promiedos page');
     
-    const data = await response.json();
-    const fixtures = data.response;
+    const data = JSON.parse(match[1]).props.pageProps.data;
 
-    if (!fixtures || fixtures.length === 0) {
-       return NextResponse.json({ message: 'No hay partidos programados para hoy.' });
-    }
+    // 3. Map teams using the 'flag' column in our DB
+    const { data: dbTeams, error: dbTeamsError } = await supabase.from('teams').select('*');
+    if (dbTeamsError) throw dbTeamsError;
 
-    // 3. Process each match and update our database
-    for (const item of fixtures) {
-      const fixture = item.fixture;
-      const goals = item.goals;
-      const score = item.score;
-      const teams = item.teams;
-      
-      const api_id = fixture.id;
-      const shortStatus = fixture.status.short; // 'FT', '1H', '2H', 'NS', 'PEN', 'AET'
-      
-      // Mapeo de estado:
-      let mappedStatus = 'pending';
-      if (['NS', 'TBD', 'PST'].includes(shortStatus)) {
-        mappedStatus = 'pending';
-      } else if (['1H', 'HT', '2H', 'ET', 'BT', 'P', 'SUSP', 'INT'].includes(shortStatus)) {
-        mappedStatus = 'in_play';
-      } else if (['FT', 'AET', 'PEN', 'AWD', 'WO'].includes(shortStatus)) {
-        mappedStatus = 'finished';
-      }
-
-      // Preparamos los datos de actualización
-      const updateData: any = {
-        status: mappedStatus,
-        home_score: goals.home !== null ? goals.home : null,
-        away_score: goals.away !== null ? goals.away : null,
-      };
-
-      // Manejar victoria por penales
-      if (shortStatus === 'PEN' && score.penalty) {
-        if (score.penalty.home > score.penalty.away) {
-           // Local ganó por penales (debemos buscar su ID en nuestra BD mediante su api_id)
-           // Haremos un select rápido para obtener el ID interno
-           const { data: homeTeamData } = await supabase.from('teams').select('id').eq('api_id', teams.home.id).single();
-           if (homeTeamData) updateData.winner_by_penalties_team_id = homeTeamData.id;
-        } else if (score.penalty.away > score.penalty.home) {
-           const { data: awayTeamData } = await supabase.from('teams').select('id').eq('api_id', teams.away.id).single();
-           if (awayTeamData) updateData.winner_by_penalties_team_id = awayTeamData.id;
+    const promiedosToDbTeam: Record<string, number> = {};
+    for (const team of dbTeams) {
+      if (team.flag) {
+        const parts = team.flag.split('/');
+        if (parts.length > 5) {
+          const promiedosId = parts[5];
+          promiedosToDbTeam[promiedosId] = team.id;
         }
       }
-
-      // Actualizar en la base de datos buscando por el api_id del partido
-      await supabase
-        .from('matches')
-        .update(updateData)
-        .eq('api_id', api_id);
     }
 
-    // 4. Trigger points calculation for all finished matches
-    // Ejecuta el procedure en Supabase para recalcular puntos si corresponde.
+    // 4. Update Matches
+    const games = data.games.filters;
+    let matchesCount = 0;
+    
+    for (const filter of games) {
+      if (!filter.games) continue;
+      for (const game of filter.games) {
+        if (!game.teams || game.teams.length < 2) continue;
+        
+        const homeTeamId = promiedosToDbTeam[game.teams[0].id];
+        const awayTeamId = promiedosToDbTeam[game.teams[1].id];
+        
+        if (!homeTeamId || !awayTeamId) continue;
+
+        let mappedStatus = 'pending';
+        if (game.status.name === 'Prog.') mappedStatus = 'pending';
+        else if (game.status.name === 'Fin' || game.status.name === 'Fin Pen.') mappedStatus = 'finished';
+        else mappedStatus = 'in_play';
+
+        const updateData: any = {
+          status: mappedStatus,
+          home_score: game.winner !== -1 ? game.teams[0].goals : null,
+          away_score: game.winner !== -1 ? game.teams[1].goals : null,
+        };
+
+        await supabase
+          .from('matches')
+          .update(updateData)
+          .eq('promiedos_id', game.id);
+          
+        matchesCount++;
+      }
+    }
+
+    // 5. Update Players (Goleadores)
+    const playersTable = data.players_statistics?.tables?.find((t: any) => t.name === 'Goles');
+    let playersCount = 0;
+    if (playersTable && playersTable.rows) {
+      for (const row of playersTable.rows) {
+        const playerObj = row.entity.object;
+        const goalsValue = row.values.find((v: any) => v.key === 'Goals')?.value;
+        const goals = parseInt(goalsValue) || 0;
+        
+        const promiedosId = playerObj.sname || playerObj.name;
+
+        await supabase
+          .from('players')
+          .update({ goals })
+          .eq('promiedos_id', promiedosId);
+          
+        playersCount++;
+      }
+    }
+
+    // 6. Trigger points calculation for all finished matches
     const { error: rpcError } = await supabase.rpc('calculate_points');
 
     if (rpcError) {
       console.error("Error calculando puntos:", rpcError);
-      return NextResponse.json({ error: 'Error al calcular puntos', details: rpcError }, { status: 500 });
     }
 
     return NextResponse.json({ 
       success: true, 
-      message: `${fixtures.length} partidos procesados exitosamente.` 
+      message: `Procesados ${matchesCount} partidos y ${playersCount} goleadores desde Promiedos.` 
     });
 
   } catch (error: any) {

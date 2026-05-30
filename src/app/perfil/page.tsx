@@ -6,6 +6,7 @@ import { User, CreditCard, ShieldCheck, ShieldAlert, CheckCircle2, AlertCircle, 
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { NicknameForm } from './NicknameForm';
+import { LogoutButton } from '@/components/auth/LogoutButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -97,8 +98,10 @@ export default async function ProfilePage() {
               )}
 
               <NicknameForm currentNickname={profile?.nickname} />
+              
+              <LogoutButton />
 
-              <div className="space-y-4">
+              <div className="space-y-4 mt-6">
                 <div>
                   <h3 className="text-xs font-bold uppercase text-muted-foreground mb-2 tracking-wider">Estado de Inscripción</h3>
                   

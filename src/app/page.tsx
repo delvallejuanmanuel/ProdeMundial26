@@ -24,9 +24,15 @@ export default async function Home() {
     );
   }
 
-  // Calculate next 48 hours
-  const now = new Date();
-  const next48h = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+  // Calculate next 48 hours. If the tournament hasn't started yet, show the first 48 hours of the tournament.
+  let startDate = new Date();
+  const wcStartDate = new Date('2026-06-11T00:00:00Z');
+  
+  if (startDate < wcStartDate) {
+    startDate = wcStartDate;
+  }
+  
+  const next48h = new Date(startDate.getTime() + 48 * 60 * 60 * 1000);
 
   // Fetch actual matches from DB for next 48 hours
   const { data: matches, error } = await supabase
@@ -41,7 +47,7 @@ export default async function Home() {
       home_team:teams!home_team_id (name, flag),
       away_team:teams!away_team_id (name, flag)
     `)
-    .gte('kickoff_time', now.toISOString())
+    .gte('kickoff_time', startDate.toISOString())
     .lte('kickoff_time', next48h.toISOString())
     .order('kickoff_time', { ascending: true });
 
@@ -64,6 +70,20 @@ export default async function Home() {
     
   const predictions = userPredictions || [];
 
+  // Fetch counts for PotWidget
+  const { count: paidGroupsCount } = await supabase
+    .from('profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('paid_groups', true);
+
+  const { count: paidKnockoutsCount } = await supabase
+    .from('profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('paid_knockouts', true);
+
+  const totalGroupsPaid = paidGroupsCount || 0;
+  const totalKnockoutsPaid = paidKnockoutsCount || 0;
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header isAdmin={isAdmin} />
@@ -81,18 +101,20 @@ export default async function Home() {
           </div>
         )}
 
-        {/* Welcome Section */}
-        <section className="space-y-2">
-          <h1 className="text-3xl font-black tracking-tight">
-            Hola, {profile?.nickname || profile?.name || user.user_metadata?.full_name || 'Participante'} 👋
-          </h1>
-          <p className="text-muted-foreground">Aquí está el estado actual del torneo. ¡No olvides cargar tus pronósticos!</p>
-        </section>
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Welcome Section */}
+          <section className="space-y-2 flex-1">
+            <h1 className="text-3xl font-black tracking-tight">
+              Hola, {profile?.nickname || profile?.name || user.user_metadata?.full_name || 'Participante'} 👋
+            </h1>
+            <p className="text-muted-foreground">Aquí está el estado actual del torneo. ¡No olvides cargar tus pronósticos!</p>
+          </section>
 
-        {/* Pot Widget Section */}
-        <section>
-          <PotWidget />
-        </section>
+          {/* Pot Widget Section */}
+          <section className="lg:w-1/3 shrink-0">
+            <PotWidget totalGroupsPaid={totalGroupsPaid} totalKnockoutsPaid={totalKnockoutsPaid} />
+          </section>
+        </div>
 
         {/* Fixture / Matches Section */}
         <section className="space-y-6">

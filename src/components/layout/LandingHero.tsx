@@ -77,7 +77,7 @@ export function LandingHero() {
               <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center mx-auto md:mx-0 border border-purple-500/20">
                 <Users className="w-7 h-7 text-purple-400" />
               </div>
-              <h3 className="text-xl font-bold">Compite en Vivo</h3>
+              <h3 className="text-xl font-bold">Pronostica la Gloria</h3>
               <p className="text-muted-foreground leading-relaxed">
                 Mira como la tabla de posiciones se actualiza al instante con cada gol. La gloria y el premio mayor esperan al mejor estratega.
               </p>
