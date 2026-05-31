@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Menu, User, Bell, ShieldAlert, X } from 'lucide-react';
+import { Menu, User, ShieldAlert, X } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 
 interface HeaderProps {
