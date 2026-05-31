@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Menu, User, Bell, ShieldAlert, X } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { NotificationBell } from './NotificationBell';
 
 interface HeaderProps {
   isAdmin?: boolean;
@@ -72,7 +71,6 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
                   <ShieldAlert className="h-5 w-5" />
                 </Link>
               )}
-              <NotificationBell />
               <Link href="/perfil" className={buttonVariants({ variant: "outline", className: "hidden sm:flex gap-2 rounded-full border-border/50 bg-secondary/50" })}>
                 <User className="h-4 w-4" />
                 <span>Mi Perfil</span>

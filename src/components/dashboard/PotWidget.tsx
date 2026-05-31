@@ -48,9 +48,10 @@ export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0 }: PotWi
           {/* Prize Distribution */}
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-background/50 rounded-xl p-3 border border-border/50 text-center">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Premio F. Grupos (30%)</p>
-                <p className="text-xl font-black text-primary">${phasePrize.toLocaleString('es-AR')}</p>
+              <div className="bg-background/50 rounded-xl p-3 border border-border/50 text-center flex flex-col justify-center">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Premio x Fecha (10%)</p>
+                <p className="text-xl font-black text-primary">${(phasePrize / 3).toLocaleString('es-AR')}</p>
+                <p className="text-[9px] text-muted-foreground mt-1 text-center leading-tight">Fechas 1, 2 y 3</p>
               </div>
               <div className="bg-background/50 rounded-xl p-3 border border-primary/20 text-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-primary/5"></div>

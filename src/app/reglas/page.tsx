@@ -33,7 +33,7 @@ export default async function ReglasPage() {
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <h4 className="font-bold text-foreground mb-2">Distribución del Pozo:</h4>
               <ul className="list-disc list-inside space-y-1">
-                <li><strong className="text-foreground">30% del Pozo Total:</strong> Premio para el ganador de la <strong>Fase de Grupos</strong>. Quien sume más puntos al finalizar el último partido de esta fase (abarcando las 3 fechas de la fase de grupos) se lleva este premio.</li>
+                <li><strong className="text-foreground">30% del Pozo Total (Fase de Grupos):</strong> Este porcentaje se divide en 3 premios iguales (10% cada uno) para los jugadores que sumen más puntos en cada una de las fechas individuales (Ganador Fecha 1, Ganador Fecha 2 y Ganador Fecha 3).</li>
                 <li><strong className="text-foreground">70% del Pozo Total:</strong> Premio <strong>Global</strong>. Se otorga al jugador que sume la mayor cantidad de puntos a lo largo de <strong>todo el torneo</strong> (Fase de Grupos + Eliminatorias + Final).</li>
               </ul>
             </div>
