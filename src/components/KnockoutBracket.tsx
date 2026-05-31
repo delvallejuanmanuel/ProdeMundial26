@@ -157,9 +157,9 @@ export async function KnockoutBracket() {
     home_team_id: m.home_team_id,
     away_team_id: m.away_team_id,
     home_name: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.name || m.home_team_placeholder || 'Por definir',
-    home_flag: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.flag || 'https://flagcdn.com/w40/xx.png',
+    home_flag: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.flag || '',
     away_name: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.name || m.away_team_placeholder || 'Por definir',
-    away_flag: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.flag || 'https://flagcdn.com/w40/xx.png',
+    away_flag: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.flag || '',
     t1: Array.isArray(m.t1) ? m.t1[0] : m.t1,
     t2: Array.isArray(m.t2) ? m.t2[0] : m.t2
   }));
