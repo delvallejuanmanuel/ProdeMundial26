@@ -32,6 +32,7 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
                 <Link href="/leaderboard" className="hover:text-primary transition-colors">Posiciones</Link>
                 <Link href="/especiales" className="hover:text-primary transition-colors">Especiales</Link>
                 <Link href="/estadisticas" className="hover:text-primary transition-colors">Estadísticas</Link>
+                <Link href="/reglas" className="hover:text-primary transition-colors">Reglas</Link>
                 {isAdmin && (
                   <Link href="/admin" className="hover:text-primary transition-colors flex items-center gap-1 text-primary">
                     <ShieldAlert className="w-4 h-4" /> Admin
@@ -43,6 +44,7 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
             <div className="hidden md:flex items-center gap-6 font-medium text-sm text-muted-foreground">
               <Link href="/leaderboard" className="hover:text-primary transition-colors">Posiciones</Link>
               <Link href="/estadisticas" className="hover:text-primary transition-colors">Estadísticas</Link>
+              <Link href="/reglas" className="hover:text-primary transition-colors">Reglas</Link>
             </div>
           )}
           

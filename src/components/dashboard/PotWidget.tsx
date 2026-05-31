@@ -15,7 +15,8 @@ export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0 }: PotWi
   const totalPot = groupsPot + knockoutsPot;
   
   const currentPhase = "Fase de Grupos";
-  const phasePrize = groupsPot; // Simplified, assuming all goes to the phase prize
+  const phasePrize = totalPot * 0.30; // 30% of total goes to Group Phase winner
+  const globalPrize = totalPot * 0.70; // 70% of total goes to Global winner
   const totalPaid = Math.max(totalGroupsPaid, totalKnockoutsPaid); // Approximation of unique users
 
   return (
@@ -44,11 +45,18 @@ export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0 }: PotWi
 
           <div className="w-full h-px bg-border/50"></div>
 
-          {/* Current Phase Prize */}
+          {/* Prize Distribution */}
           <div className="space-y-4">
-            <div className="bg-background/50 rounded-xl p-4 border border-border/50 text-center">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Premio {currentPhase}</p>
-              <p className="text-2xl font-black text-primary">${phasePrize.toLocaleString('es-AR')}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-background/50 rounded-xl p-3 border border-border/50 text-center">
+                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">Premio F. Grupos (30%)</p>
+                <p className="text-xl font-black text-primary">${phasePrize.toLocaleString('es-AR')}</p>
+              </div>
+              <div className="bg-background/50 rounded-xl p-3 border border-primary/20 text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-primary/5"></div>
+                <p className="text-[10px] font-semibold text-primary/80 uppercase tracking-wider mb-1 relative">Premio Global (70%)</p>
+                <p className="text-xl font-black text-primary relative">${globalPrize.toLocaleString('es-AR')}</p>
+              </div>
             </div>
 
             <div className="space-y-1.5">
