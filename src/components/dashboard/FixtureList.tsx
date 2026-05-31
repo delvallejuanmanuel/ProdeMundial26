@@ -101,40 +101,67 @@ export function FixtureList({
         Mostrando {filteredMatches.length} partido(s)
       </div>
 
-      {/* Match Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Match Grid Grouped by Date */}
+      <div className="space-y-12">
         {filteredMatches.length > 0 ? (
-          filteredMatches.map((match) => {
-            const date = new Date(match.kickoff_time);
-            const userPrediction = predictions.find(p => p.match_id === match.id);
-            const isGroupStage = match.phase.toLowerCase().startsWith('grupo');
-            const canPlayMatch = isGroupStage ? hasPaidGroups : hasPaidKnockouts;
-            
-            return (
-              <MatchCard 
-                key={match.id}
-                matchId={match.id}
-                homeTeam={match.home_team?.name || match.home_team_placeholder || 'Por definir'} 
-                awayTeam={match.away_team?.name || match.away_team_placeholder || 'Por definir'} 
-                homeFlag={match.home_team?.flag || '❓'} 
-                awayFlag={match.away_team?.flag || '❓'} 
-                matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
-                matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} 
-                groupName={match.phase.toUpperCase()} 
-                status={match.status} 
-                userId={userId}
-                hasPaid={canPlayMatch}
-                actualHomeScore={match.home_score}
-                actualAwayScore={match.away_score}
-                awardedPoints={userPrediction?.awarded_points}
-                initialHomeScore={userPrediction?.predicted_home_score}
-                initialAwayScore={userPrediction?.predicted_away_score}
-                kickoffTime={match.kickoff_time}
-              />
-            );
-          })
+          Object.entries(
+            filteredMatches.reduce((groups, match) => {
+              const dateObj = new Date(match.kickoff_time);
+              // Capitalize first letter of weekday and month
+              let dateStr = dateObj.toLocaleDateString('es-AR', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long' });
+              dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+              
+              if (!groups[dateStr]) groups[dateStr] = [];
+              groups[dateStr].push(match);
+              return groups;
+            }, {} as Record<string, typeof filteredMatches>)
+          ).map(([dateLabel, dateMatches]) => (
+            <div key={dateLabel} className="space-y-6">
+              {/* Date Header */}
+              <div className="flex items-center gap-4">
+                <div className="h-px bg-border/50 flex-1"></div>
+                <h3 className="text-lg font-black tracking-tight text-primary uppercase bg-background px-4 py-2 border border-border/50 rounded-full shadow-sm">
+                  {dateLabel}
+                </h3>
+                <div className="h-px bg-border/50 flex-1"></div>
+              </div>
+              
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {dateMatches.map((match) => {
+                  const date = new Date(match.kickoff_time);
+                  const userPrediction = predictions.find(p => p.match_id === match.id);
+                  const isGroupStage = match.phase.toLowerCase().startsWith('grupo');
+                  const canPlayMatch = isGroupStage ? hasPaidGroups : hasPaidKnockouts;
+                  
+                  return (
+                    <MatchCard 
+                      key={match.id}
+                      matchId={match.id}
+                      homeTeam={match.home_team?.name || match.home_team_placeholder || 'Por definir'} 
+                      awayTeam={match.away_team?.name || match.away_team_placeholder || 'Por definir'} 
+                      homeFlag={match.home_team?.flag || '❓'} 
+                      awayFlag={match.away_team?.flag || '❓'} 
+                      matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
+                      matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} 
+                      groupName={match.phase.toUpperCase()} 
+                      status={match.status} 
+                      userId={userId}
+                      hasPaid={canPlayMatch}
+                      actualHomeScore={match.home_score}
+                      actualAwayScore={match.away_score}
+                      awardedPoints={userPrediction?.awarded_points}
+                      initialHomeScore={userPrediction?.predicted_home_score}
+                      initialAwayScore={userPrediction?.predicted_away_score}
+                      kickoffTime={match.kickoff_time}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          ))
         ) : (
-          <div className="col-span-full text-center py-8 text-muted-foreground border border-dashed border-border/50 rounded-xl">
+          <div className="text-center py-12 text-muted-foreground border border-dashed border-border/50 rounded-xl">
             No hay partidos para mostrar con este filtro.
           </div>
         )}

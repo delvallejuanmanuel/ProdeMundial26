@@ -73,16 +73,22 @@ export function NotificationBell() {
         {loading ? (
           <div className="p-4 text-center text-sm text-muted-foreground">Cargando...</div>
         ) : hasNotifications ? (
-          notifications.map((notif, i) => (
-            <DropdownMenuItem key={i} className="flex flex-col items-start gap-1 p-3">
-              <span className="text-sm font-medium">
-                {notif.match.home?.name || 'Local'} vs {notif.match.away?.name || 'Visita'}
-              </span>
-              <span className="text-xs text-primary font-bold">
-                ¡Sumaste +{notif.awarded_points} pts!
-              </span>
-            </DropdownMenuItem>
-          ))
+          notifications.map((notif, i) => {
+            const matchObj = Array.isArray(notif.match) ? notif.match[0] : notif.match;
+            const homeName = (Array.isArray(matchObj?.home) ? matchObj?.home[0] : matchObj?.home)?.name || 'Local';
+            const awayName = (Array.isArray(matchObj?.away) ? matchObj?.away[0] : matchObj?.away)?.name || 'Visita';
+            
+            return (
+              <DropdownMenuItem key={i} className="flex flex-col items-start gap-1 p-3">
+                <span className="text-sm font-medium">
+                  {homeName} vs {awayName}
+                </span>
+                <span className="text-xs text-primary font-bold">
+                  ¡Sumaste +{notif.awarded_points} pts!
+                </span>
+              </DropdownMenuItem>
+            );
+          })
         ) : (
           <div className="p-4 text-center text-sm text-muted-foreground">
             No tienes aciertos recientes.

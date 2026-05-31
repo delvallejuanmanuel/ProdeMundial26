@@ -1,10 +1,18 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Trophy, Target, ShieldAlert, Coins } from 'lucide-react';
+import { Header } from '@/components/layout/Header';
+import { createClient } from '@/utils/supabase/server';
 
-export default function ReglasPage() {
+export default async function ReglasPage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data: profile } = user ? await supabase.from('profiles').select('is_admin').eq('id', user.id).single() : { data: null };
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <Header isAdmin={profile?.is_admin} isLoggedIn={!!user} />
+      <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8 flex-1">
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-black tracking-tight text-foreground">Reglas del Prode</h1>
         <p className="text-muted-foreground">Términos, condiciones y sistema de puntuación.</p>
@@ -25,7 +33,7 @@ export default function ReglasPage() {
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <h4 className="font-bold text-foreground mb-2">Distribución del Pozo:</h4>
               <ul className="list-disc list-inside space-y-1">
-                <li><strong className="text-foreground">30% del Pozo Total:</strong> Premio para el ganador de la <strong>Fase de Grupos</strong>. Quien sume más puntos al finalizar el último partido de la fase de grupos se lleva este premio.</li>
+                <li><strong className="text-foreground">30% del Pozo Total:</strong> Premio para el ganador de la <strong>Fase de Grupos</strong>. Quien sume más puntos al finalizar el último partido de esta fase (abarcando las 3 fechas de la fase de grupos) se lleva este premio.</li>
                 <li><strong className="text-foreground">70% del Pozo Total:</strong> Premio <strong>Global</strong>. Se otorga al jugador que sume la mayor cantidad de puntos a lo largo de <strong>todo el torneo</strong> (Fase de Grupos + Eliminatorias + Final).</li>
               </ul>
             </div>
@@ -57,6 +65,28 @@ export default function ReglasPage() {
                 <span><strong>Acierto de Tendencia:</strong> Acertaste al equipo ganador, pero no la diferencia de goles (ej: Predijiste 1-0 y salió 3-0).</span>
               </li>
             </ul>
+
+            <div className="w-full h-px bg-border/50 my-4"></div>
+            
+            <p className="font-bold text-foreground">Pronósticos Especiales (Se otorgan al finalizar el Mundial):</p>
+            <ul className="list-none space-y-3">
+              <li className="flex items-center gap-2">
+                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs">+10 pts</span>
+                <span><strong>Campeón:</strong> Acertar el equipo que ganará la copa.</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs">+5 pts</span>
+                <span><strong>Subcampeón:</strong> Acertar el equipo que perderá la final.</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs">+7 pts</span>
+                <span><strong>Goleador del Torneo:</strong> Acertar el máximo anotador de la competición.</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs">+5 pts</span>
+                <span><strong>Decepción del Torneo:</strong> Acertar un equipo "candidato" que quede eliminado en la Fase de Grupos.</span>
+              </li>
+            </ul>
           </CardContent>
         </Card>
 
@@ -77,6 +107,7 @@ export default function ReglasPage() {
           </CardContent>
         </Card>
 
+      </div>
       </div>
     </div>
   );
