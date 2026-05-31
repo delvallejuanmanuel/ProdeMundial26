@@ -20,6 +20,16 @@ export async function GET(request: Request) {
   }
 
   try {
+    // TEMPORARY: The World Cup hasn't started yet. The Promiedos URL was pulling 2022 data
+    // which incorrectly populated the Knockout brackets with 2022 teams (Quarterfinals etc).
+    // We return early until the 2026 tournament starts.
+    if (new Date() < new Date('2026-06-11T00:00:00Z')) {
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Sincronización pausada: El Mundial 2026 aún no ha comenzado.' 
+      });
+    }
+
     // 2. Fetch data from Promiedos
     const PROMIEDOS_URL = 'https://www.promiedos.com.ar/league/fifa-world-cup/fjda'; // 2022 World Cup URL for testing
     const response = await fetch(PROMIEDOS_URL, { cache: 'no-store' });

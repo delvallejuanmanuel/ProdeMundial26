@@ -194,8 +194,8 @@ export async function KnockoutBracket() {
         <p className="text-sm text-muted-foreground">A medida que avance el mundial, los equipos irán completando las llaves automáticamente.</p>
       </div>
 
-      <div className="overflow-x-auto pb-6 custom-scrollbar">
-        <div className="min-w-[1200px] flex justify-between items-center gap-4">
+      <div className="overflow-x-auto pb-6 custom-scrollbar px-4">
+        <div className="min-w-[1900px] flex justify-between items-center gap-4">
           
           {/* LEFT SIDE */}
           <div className="flex gap-4 items-center">
