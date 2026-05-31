@@ -31,9 +31,11 @@ export async function GET(request: Request) {
     
     const data = JSON.parse(match[1]).props.pageProps.data;
 
-    // 3. Map teams using the 'flag' column in our DB
+    // 3. Fetch all Teams and Matches from DB
     const { data: dbTeams, error: dbTeamsError } = await supabase.from('teams').select('*');
     if (dbTeamsError) throw dbTeamsError;
+    const { data: dbMatches, error: dbMatchesError } = await supabase.from('matches').select('*');
+    if (dbMatchesError) throw dbMatchesError;
 
     const promiedosToDbTeam: Record<string, number> = {};
     for (const team of dbTeams) {
@@ -69,14 +71,25 @@ export async function GET(request: Request) {
           status: mappedStatus,
           home_score: game.winner !== -1 ? game.teams[0].goals : null,
           away_score: game.winner !== -1 ? game.teams[1].goals : null,
+          promiedos_id: game.id // Keep promiedos_id synced
         };
 
-        await supabase
-          .from('matches')
-          .update(updateData)
-          .eq('promiedos_id', game.id);
-          
-        matchesCount++;
+        // Find match by exact promiedos_id OR by order-agnostic teams (first unlinked match)
+        const matchInDb = dbMatches.find((m: any) => m.promiedos_id === game.id) || 
+          dbMatches.find((m: any) => 
+            !m.promiedos_id && // Only link if not already linked
+            ((m.home_team_id === homeTeamId && m.away_team_id === awayTeamId) ||
+             (m.home_team_id === awayTeamId && m.away_team_id === homeTeamId))
+          );
+
+        if (matchInDb) {
+          await supabase
+            .from('matches')
+            .update(updateData)
+            .eq('id', matchInDb.id);
+            
+          matchesCount++;
+        }
       }
     }
 
@@ -114,6 +127,27 @@ export async function GET(request: Request) {
 
   } catch (error: any) {
     console.error("Cron Job Error:", error);
+    
+    if (process.env.RESEND_API_KEY && process.env.ALERT_EMAIL) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'Prode Mundial <onboarding@resend.dev>',
+            to: process.env.ALERT_EMAIL,
+            subject: '[ALERTA CRÍTICA] Fallo en Prode Mundial Cronjob',
+            html: `<p>El cronjob de sincronización ha fallado.</p><p><strong>Error:</strong> ${error.message}</p>`
+          })
+        });
+      } catch(e) {
+         console.error("Failed to send alert email", e);
+      }
+    }
+    
     return NextResponse.json({ error: 'Error Interno del Servidor', message: error.message }, { status: 500 });
   }
 }

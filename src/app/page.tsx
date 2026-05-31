@@ -86,6 +86,19 @@ export default async function Home() {
   const totalGroupsPaid = paidGroupsCount || 0;
   const totalKnockoutsPaid = paidKnockoutsCount || 0;
 
+  // Fetch leaderboard to calculate rank and get stats
+  const { data: leaderboard } = await supabase
+    .from('v_leaderboard')
+    .select('*')
+    .order('total_score', { ascending: false })
+    .order('exact_matches', { ascending: false })
+    .order('special_points', { ascending: false });
+
+  const userStats = leaderboard?.find((u: any) => u.user_id === user.id);
+  const userRank = leaderboard?.findIndex((u: any) => u.user_id === user.id) !== undefined && leaderboard!.findIndex((u: any) => u.user_id === user.id) !== -1 
+    ? (leaderboard!.findIndex((u: any) => u.user_id === user.id) + 1) 
+    : '-';
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header isAdmin={isAdmin} />
@@ -105,11 +118,34 @@ export default async function Home() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Welcome Section */}
-          <section className="space-y-2 flex-1">
-            <h1 className="text-3xl font-black tracking-tight">
-              Hola, {profile?.nickname || profile?.name || user.user_metadata?.full_name || 'Participante'} 👋
-            </h1>
-            <p className="text-muted-foreground">Aquí está el estado actual del torneo. ¡No olvides cargar tus pronósticos!</p>
+          <section className="space-y-4 flex-1">
+            <div>
+              <h1 className="text-3xl font-black tracking-tight">
+                Hola, {profile?.nickname || profile?.name || user.user_metadata?.full_name || 'Participante'} 👋
+              </h1>
+              <p className="text-muted-foreground mt-1">Aquí está el estado actual del torneo. ¡No olvides cargar tus pronósticos!</p>
+            </div>
+            
+            {userStats && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div className="bg-background border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm">
+                  <span className="text-2xl font-black text-primary">{userRank}º</span>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Posición</span>
+                </div>
+                <div className="bg-background border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm">
+                  <span className="text-2xl font-black text-yellow-500">{userStats.total_score}</span>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Puntos</span>
+                </div>
+                <div className="bg-background border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm">
+                  <span className="text-2xl font-black text-green-500">{userStats.exact_matches}</span>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Plenos</span>
+                </div>
+                <div className="bg-background border border-border/50 rounded-xl p-3 flex flex-col items-center justify-center text-center shadow-sm">
+                  <span className="text-2xl font-black text-purple-500">{userStats.special_points}</span>
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Extras</span>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* Pot Widget Section */}

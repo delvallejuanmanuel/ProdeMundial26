@@ -191,13 +191,13 @@ export function MatchesTable() {
                     </td>
                     <td className="px-4 py-3">
                       <select 
-                        className="bg-background border border-border/50 rounded p-2 text-sm outline-none focus:ring-2 focus:ring-primary"
+                        className="bg-card text-card-foreground border border-border/50 rounded p-2 text-sm outline-none focus:ring-2 focus:ring-primary w-full"
                         value={match.status}
                         onChange={(e) => handleUpdateMatch(match.id, 'status', e.target.value)}
                       >
-                        <option value="pending">Pendiente</option>
-                        <option value="in_play">En Vivo</option>
-                        <option value="finished">Finalizado</option>
+                        <option value="pending" className="bg-card text-card-foreground">Pendiente</option>
+                        <option value="in_play" className="bg-card text-card-foreground">En Vivo</option>
+                        <option value="finished" className="bg-card text-card-foreground">Finalizado</option>
                       </select>
                     </td>
                     <td className="px-4 py-3 text-center">

@@ -91,10 +91,10 @@ export function SpecialResultsForm() {
             <select 
               value={champion}
               onChange={(e) => setChampion(e.target.value)}
-              className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+              className="w-full bg-card text-card-foreground border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
             >
-              <option value="">Seleccionar...</option>
-              {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              <option value="" className="bg-card text-card-foreground">Seleccionar...</option>
+              {teams.map(t => <option key={t.id} value={t.id} className="bg-card text-card-foreground">{t.name}</option>)}
             </select>
           </div>
 
@@ -106,10 +106,10 @@ export function SpecialResultsForm() {
             <select 
               value={runnerUp}
               onChange={(e) => setRunnerUp(e.target.value)}
-              className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+              className="w-full bg-card text-card-foreground border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
             >
-              <option value="">Seleccionar...</option>
-              {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              <option value="" className="bg-card text-card-foreground">Seleccionar...</option>
+              {teams.map(t => <option key={t.id} value={t.id} className="bg-card text-card-foreground">{t.name}</option>)}
             </select>
           </div>
 
@@ -121,10 +121,10 @@ export function SpecialResultsForm() {
             <select 
               value={topScorer}
               onChange={(e) => setTopScorer(e.target.value)}
-              className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+              className="w-full bg-card text-card-foreground border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
             >
-              <option value="">Seleccionar...</option>
-              {players.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              <option value="" className="bg-card text-card-foreground">Seleccionar...</option>
+              {players.map(p => <option key={p.id} value={p.id} className="bg-card text-card-foreground">{p.name}</option>)}
             </select>
           </div>
 
@@ -136,10 +136,10 @@ export function SpecialResultsForm() {
             <select 
               value={disappointment}
               onChange={(e) => setDisappointment(e.target.value)}
-              className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
+              className="w-full bg-card text-card-foreground border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
             >
-              <option value="">Seleccionar...</option>
-              {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              <option value="" className="bg-card text-card-foreground">Seleccionar...</option>
+              {teams.map(t => <option key={t.id} value={t.id} className="bg-card text-card-foreground">{t.name}</option>)}
             </select>
           </div>
         </div>

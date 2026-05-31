@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { NicknameForm } from './NicknameForm';
 import { LogoutButton } from '@/components/auth/LogoutButton';
+import { PaymentNotification } from '@/components/dashboard/PaymentNotification';
 
 export const dynamic = 'force-dynamic';
 
@@ -149,29 +150,20 @@ export default async function ProfilePage() {
                       <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">Datos de Transferencia</div>
                       <div className="flex justify-between items-center pb-2 border-b border-border/20">
                         <span className="text-sm text-muted-foreground">Alias Mercado Pago</span>
-                        <span className="font-bold text-primary bg-primary/10 px-2 py-1 rounded select-all">{mpAlias}</span>
+                        <span className="font-bold text-primary bg-primary/10 px-2 py-1 rounded select-all">juanma.delva.mp</span>
+                      </div>
+                      <div className="flex justify-between items-center pb-2 border-b border-border/20">
+                        <span className="text-sm text-muted-foreground">CVU</span>
+                        <span className="font-bold text-primary bg-primary/10 px-2 py-1 rounded select-all">0000003100032303147331</span>
                       </div>
                       <div className="flex justify-between items-center pt-2">
                         <span className="text-sm text-muted-foreground">Titular</span>
-                        <span className="font-bold">Admin Prode</span>
+                        <span className="font-bold">Juan Manuel del Valle</span>
                       </div>
                     </div>
 
-                    <div className="bg-blue-500/10 border border-blue-500/30 p-4 rounded-xl flex gap-3 text-sm text-blue-400 mt-4">
-                      <Info className="w-5 h-5 shrink-0" />
-                      <p>
-                        <strong>Importante:</strong> Luego de transferir, envíale el comprobante al administrador por WhatsApp indicando tu email de registro ({profile?.email}) para que active tu cuenta.
-                      </p>
-                    </div>
+                    <PaymentNotification hasNotified={profile?.payment_notified || false} userId={user.id} />
 
-                  </div>
-
-                  <div className="shrink-0 flex flex-col items-center p-4 bg-white rounded-xl shadow-lg">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={qrUrl} alt="QR Mercado Pago" className="w-40 h-40" />
-                    <div className="text-black font-bold mt-3 text-sm flex items-center gap-1">
-                      <span className="bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded font-black tracking-tighter">mp</span> Escanear para pagar
-                    </div>
                   </div>
 
                 </div>
@@ -185,22 +177,6 @@ export default async function ProfilePage() {
                 </p>
               </div>
             )}
-
-            {/* Términos y Condiciones */}
-            <div className="bg-card border border-border/50 rounded-2xl p-6 shadow-xl">
-              <h3 className="font-bold flex items-center gap-2 mb-4">
-                <AlertCircle className="w-5 h-5 text-muted-foreground" />
-                Términos y Condiciones
-              </h3>
-              <div className="text-xs text-muted-foreground space-y-3 bg-background/50 p-4 rounded-xl border border-border/30 h-48 overflow-y-auto">
-                <p>1. <strong>Inscripción:</strong> La participación en el Prode Mundial 2026 requiere el pago previo de la inscripción estipulada. El no pago resultará en la inhabilitación para cargar o editar pronósticos.</p>
-                <p>2. <strong>Plazos:</strong> Los pronósticos de cada partido podrán cargarse o modificarse hasta exactamente la hora de inicio (kick-off) del encuentro. Una vez iniciado, el partido queda bloqueado ("En Vivo").</p>
-                <p>3. <strong>Puntajes:</strong> Se otorgan 3 puntos por acertar el resultado exacto, 2 puntos por acertar la diferencia de goles correcta (y el ganador), 1 punto por acertar solo ganador/empate, y 0 puntos en caso de no acertar. Los pronósticos especiales tienen puntajes fijos que se suman al finalizar el torneo.</p>
-                <p>4. <strong>Premios:</strong> El pozo acumulado será distribuido entre los primeros puestos de la tabla de posiciones general (Leaderboard) según la estructura de premios definida por la administración al cierre de inscripciones.</p>
-                <p>5. <strong>Empates:</strong> En caso de empate en puntos totales, el criterio de desempate será: mayor cantidad de "Plenos" (aciertos exactos), luego mayor cantidad de puntos por "Pronósticos Especiales".</p>
-                <p>6. <strong>Administración:</strong> Las decisiones del administrador (como la carga final de resultados) son definitivas. Ante cualquier disputa o error en el sistema, el administrador tiene la autoridad final para resolver la discrepancia.</p>
-              </div>
-            </div>
 
           </div>
 

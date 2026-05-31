@@ -29,26 +29,35 @@ export function NotificationBell() {
       const now = new Date();
       const past48h = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
-      // Fetch predictions with awarded points in the last 48hs
-      const { data } = await supabase
-        .from('predictions')
-        .select(`
-          awarded_points,
-          match:matches!inner(
-            id, kickoff_time,
-            home:teams!home_team_id(name),
-            away:teams!away_team_id(name)
-          )
-        `)
-        .eq('user_id', user.id)
-        .gt('awarded_points', 0)
-        .gte('match.kickoff_time', past48h)
-        .order('match(kickoff_time)', { ascending: false });
+      try {
+        // Fetch predictions with awarded points in the last 48hs
+        const { data, error } = await supabase
+          .from('predictions')
+          .select(`
+            awarded_points,
+            match:matches!inner(
+              id, kickoff_time,
+              home:teams!home_team_id(name),
+              away:teams!away_team_id(name)
+            )
+          `)
+          .eq('user_id', user.id)
+          .gt('awarded_points', 0)
+          .gte('match.kickoff_time', past48h)
+          .order('match(kickoff_time)', { ascending: false });
 
-      if (data) {
-        setNotifications(data);
+        if (error) {
+          console.error("Supabase Error fetching notifications:", error);
+          setNotifications([]);
+        } else if (data) {
+          setNotifications(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Unknown error fetching notifications:", err);
+        setNotifications([]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
     fetchNotifications();
@@ -74,9 +83,10 @@ export function NotificationBell() {
           <div className="p-4 text-center text-sm text-muted-foreground">Cargando...</div>
         ) : hasNotifications ? (
           notifications.map((notif, i) => {
-            const matchObj = Array.isArray(notif.match) ? notif.match[0] : notif.match;
-            const homeName = (Array.isArray(matchObj?.home) ? matchObj?.home[0] : matchObj?.home)?.name || 'Local';
-            const awayName = (Array.isArray(matchObj?.away) ? matchObj?.away[0] : matchObj?.away)?.name || 'Visita';
+            if (!notif) return null;
+            const matchObj = notif.match ? (Array.isArray(notif.match) ? notif.match[0] : notif.match) : null;
+            const homeName = matchObj?.home ? ((Array.isArray(matchObj.home) ? matchObj.home[0] : matchObj.home)?.name || 'Local') : 'Local';
+            const awayName = matchObj?.away ? ((Array.isArray(matchObj.away) ? matchObj.away[0] : matchObj.away)?.name || 'Visita') : 'Visita';
             
             return (
               <DropdownMenuItem key={i} className="flex flex-col items-start gap-1 p-3">
@@ -84,7 +94,7 @@ export function NotificationBell() {
                   {homeName} vs {awayName}
                 </span>
                 <span className="text-xs text-primary font-bold">
-                  ¡Sumaste +{notif.awarded_points} pts!
+                  ¡Sumaste +{notif.awarded_points || 0} pts!
                 </span>
               </DropdownMenuItem>
             );

@@ -30,15 +30,21 @@ export function UsersTable() {
   }, []);
 
   const togglePayment = async (userId: string, field: 'paid_groups' | 'paid_knockouts', currentValue: boolean) => {
+    const updateData: any = { [field]: !currentValue };
+    // If we are setting it to paid, clear the notification flag
+    if (!currentValue) {
+      updateData.payment_notified = false;
+    }
+
     const { error } = await supabase
       .from('profiles')
-      .update({ [field]: !currentValue })
+      .update(updateData)
       .eq('id', userId);
     
     if (error) {
       alert("Error al actualizar pago.");
     } else {
-      setUsers(users.map(u => u.id === userId ? { ...u, [field]: !currentValue } : u));
+      setUsers(users.map(u => u.id === userId ? { ...u, ...updateData } : u));
     }
   };
 
@@ -64,6 +70,9 @@ export function UsersTable() {
                 <td className="px-4 py-3 font-medium">
                   {user.name || 'Sin Nombre'}
                   {user.nickname && <span className="block text-xs text-muted-foreground mt-0.5">Apodo: {user.nickname}</span>}
+                  {user.payment_notified && (!user.paid_groups || !user.paid_knockouts) && (
+                    <span className="inline-block bg-yellow-500/20 text-yellow-500 text-[10px] font-bold px-2 py-0.5 rounded mt-1">Avisó Pago</span>
+                  )}
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
                 <td className="px-4 py-3 text-center">

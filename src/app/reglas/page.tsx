@@ -100,9 +100,11 @@ export default async function ReglasPage() {
           </CardHeader>
           <CardContent className="space-y-2 text-muted-foreground text-sm leading-relaxed">
             <ul className="list-disc list-inside space-y-2">
-              <li>Las predicciones pueden guardarse y modificarse libremente <strong>hasta la hora exacta del comienzo de cada partido</strong>. Una vez que el partido inicia, la predicción se bloquea y no puede alterarse.</li>
-              <li>Para los partidos de <strong>eliminatorias</strong>, el resultado que cuenta para los puntos es el de los <strong>90 minutos reglamentarios + el alargue (120 minutos)</strong>. No se cuentan los penales para el resultado de goles.</li>
-              <li>En caso de suspensión o cancelación de un partido, se determinará la conducta a seguir según la resolución oficial de la FIFA.</li>
+              <li><strong>Plazos:</strong> Las predicciones pueden guardarse y modificarse libremente <strong>hasta la hora exacta del comienzo de cada partido</strong>. Una vez que el partido inicia, la predicción se bloquea y no puede alterarse.</li>
+              <li><strong>Alargues:</strong> Para los partidos de <strong>eliminatorias</strong>, el resultado que cuenta para los puntos es el de los <strong>90 minutos reglamentarios + el alargue (120 minutos)</strong>. No se cuentan los penales para el resultado de goles.</li>
+              <li><strong>Empates en Posiciones:</strong> En caso de empate en puntos totales en la tabla de posiciones, el criterio de desempate será: mayor cantidad de "Plenos" (aciertos exactos), luego mayor cantidad de puntos por "Pronósticos Especiales".</li>
+              <li><strong>Administración:</strong> Las decisiones del administrador (como la carga final de resultados) son definitivas. Ante cualquier disputa o error en el sistema, el administrador tiene la autoridad final para resolver la discrepancia.</li>
+              <li><strong>Fuerza Mayor:</strong> En caso de suspensión o cancelación de un partido, se determinará la conducta a seguir según la resolución oficial de la FIFA.</li>
             </ul>
           </CardContent>
         </Card>
