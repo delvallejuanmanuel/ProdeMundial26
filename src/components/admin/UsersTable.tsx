@@ -12,15 +12,60 @@ export function UsersTable() {
 
   const fetchUsers = async () => {
     setIsLoading(true);
-    const { data, error } = await supabase
+    
+    // 1. Obtener partidos urgentes (la próxima fecha/jornada activa)
+    const { data: nextMatchData } = await supabase
+      .from('matches')
+      .select('kickoff_time')
+      .eq('status', 'pending')
+      .order('kickoff_time', { ascending: true })
+      .limit(1)
+      .single();
+
+    let urgentMatchIds: number[] = [];
+    if (nextMatchData?.kickoff_time) {
+      // Tomamos los partidos pendientes dentro de las 24hs siguientes al próximo partido
+      const nextMatchTime = new Date(nextMatchData.kickoff_time).getTime();
+      const cutoffTime = new Date(nextMatchTime + 24 * 60 * 60 * 1000).toISOString();
+      
+      const { data: urgentMatchesData } = await supabase
+        .from('matches')
+        .select('id')
+        .eq('status', 'pending')
+        .lte('kickoff_time', cutoffTime);
+        
+      if (urgentMatchesData) {
+        urgentMatchIds = urgentMatchesData.map(m => m.id);
+      }
+    }
+
+    // 2. Obtener usuarios y sus pronósticos
+    const { data: profiles, error } = await supabase
       .from('profiles')
-      .select('*, predictions(count)')
+      .select('*, predictions(match_id)')
       .order('created_at', { ascending: false });
     
     if (error) {
       console.error(error);
     } else {
-      setUsers(data || []);
+      // 3. Calcular faltantes
+      const processedUsers = (profiles || []).map((user: any) => {
+        const userPreds = user.predictions || [];
+        const totalPreds = userPreds.length;
+        
+        let missingUrgent = 0;
+        if (urgentMatchIds.length > 0) {
+          const predictedMatchIds = new Set(userPreds.map((p: any) => p.match_id));
+          missingUrgent = urgentMatchIds.filter(id => !predictedMatchIds.has(id)).length;
+        }
+
+        return {
+          ...user,
+          total_predictions: totalPreds,
+          missing_urgent: missingUrgent
+        };
+      });
+      setUsers(processedUsers);
     }
     setIsLoading(false);
   };
@@ -103,10 +148,26 @@ export function UsersTable() {
                 <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-xs font-bold">{user.predictions?.[0]?.count || 0} / 72</span>
-                    {(user.predictions?.[0]?.count || 0) < 72 && (
-                      <Button size="icon" variant="ghost" onClick={() => handleSendReminder(user.email, user.name)} title="Enviar recordatorio">
-                        <Bell className="w-4 h-4 text-yellow-500" />
+                    <span className="text-xs font-bold">{user.total_predictions || 0} / 72</span>
+                    {user.missing_urgent > 0 && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <span className="text-[10px] font-bold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">
+                          Faltan {user.missing_urgent} de HOY
+                        </span>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="h-6 w-6 shrink-0"
+                          onClick={() => handleSendReminder(user.email, user.name)} 
+                          title="Enviar recordatorio de urgencia"
+                        >
+                          <Bell className="w-3 h-3 text-red-500" />
+                        </Button>
+                      </div>
+                    )}
+                    {user.missing_urgent === 0 && (user.total_predictions || 0) < 72 && (
+                      <Button size="icon" variant="ghost" className="h-6 w-6 mt-1" onClick={() => handleSendReminder(user.email, user.name)} title="Enviar recordatorio general">
+                        <Bell className="w-3 h-3 text-yellow-500" />
                       </Button>
                     )}
                   </div>

@@ -167,7 +167,7 @@ export async function sendReminderEmailAction(email: string, name: string) {
         from: 'Prode Mundial <onboarding@resend.dev>',
         to: email,
         subject: '¡Falta poco! Cargá tus pronósticos del Prode',
-        html: `<p>Hola ${name || 'Jugador'},</p><p>Te recordamos que aún tenés pronósticos pendientes por cargar. ¡Apurate antes de que empiecen los partidos!</p><p>Ingresá ahora para completar tus predicciones.</p>`
+        html: `<p>Hola ${name || 'Jugador'},</p><p>Te recordamos que aún tenés pronósticos pendientes por cargar. <strong>¡Tenés partidos muy próximos a cerrarse!</strong> Apurate antes de que empiecen y te quedes sin sumar puntos.</p><p>Ingresá ahora para completar tus predicciones.</p>`
       })
     });
 
