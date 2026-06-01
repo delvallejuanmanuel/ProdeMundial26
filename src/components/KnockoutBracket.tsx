@@ -156,9 +156,9 @@ export async function KnockoutBracket() {
     winner_by_penalties_team_id: m.winner_by_penalties_team_id,
     home_team_id: m.home_team_id,
     away_team_id: m.away_team_id,
-    home_name: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.name || m.home_team_placeholder || 'Por definir',
+    home_name: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.name || m.home_team_placeholder || '',
     home_flag: (Array.isArray(m.t1) ? m.t1[0] : m.t1)?.flag || '',
-    away_name: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.name || m.away_team_placeholder || 'Por definir',
+    away_name: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.name || m.away_team_placeholder || '',
     away_flag: (Array.isArray(m.t2) ? m.t2[0] : m.t2)?.flag || '',
     t1: Array.isArray(m.t1) ? m.t1[0] : m.t1,
     t2: Array.isArray(m.t2) ? m.t2[0] : m.t2
