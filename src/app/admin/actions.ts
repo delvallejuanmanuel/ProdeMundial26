@@ -153,27 +153,31 @@ export async function toggleChatBlockAction(userId: string, currentStatus: boole
 
 export async function sendReminderEmailAction(email: string, name: string) {
   if (!process.env.RESEND_API_KEY) {
-    throw new Error('La API Key de Resend no está configurada.');
+    return { success: false, error: 'La API Key de Resend no está configurada.' };
   }
 
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: 'Prode Mundial <onboarding@resend.dev>',
-      to: email,
-      subject: '¡Falta poco! Cargá tus pronósticos del Prode',
-      html: `<p>Hola ${name || 'Jugador'},</p><p>Te recordamos que aún tenés pronósticos pendientes por cargar. ¡Apurate antes de que empiecen los partidos!</p><p>Ingresá ahora para completar tus predicciones.</p>`
-    })
-  });
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'Prode Mundial <onboarding@resend.dev>',
+        to: email,
+        subject: '¡Falta poco! Cargá tus pronósticos del Prode',
+        html: `<p>Hola ${name || 'Jugador'},</p><p>Te recordamos que aún tenés pronósticos pendientes por cargar. ¡Apurate antes de que empiecen los partidos!</p><p>Ingresá ahora para completar tus predicciones.</p>`
+      })
+    });
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    throw new Error(`Error al enviar correo: ${errorText}`);
+    if (!res.ok) {
+      const errorText = await res.text();
+      return { success: false, error: `Error de la API de Resend: ${errorText}` };
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message || 'Error desconocido al enviar correo' };
   }
-
-  return { success: true };
 }

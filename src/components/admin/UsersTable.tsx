@@ -61,8 +61,12 @@ export function UsersTable() {
   const handleSendReminder = async (email: string, name: string) => {
     try {
       const { sendReminderEmailAction } = await import('@/app/admin/actions');
-      await sendReminderEmailAction(email, name);
-      alert("Recordatorio enviado a " + email);
+      const res = await sendReminderEmailAction(email, name);
+      if (!res.success) {
+        alert("Error al enviar recordatorio: " + res.error);
+      } else {
+        alert("Recordatorio enviado a " + email);
+      }
     } catch (error: any) {
       alert("Error al enviar recordatorio: " + error.message);
     }
