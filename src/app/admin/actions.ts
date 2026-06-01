@@ -22,7 +22,13 @@ export async function updatePlayerGoalsAction(playerId: number, goals: number) {
   return { success: true };
 }
 
-export async function updateMatchAction(matchId: number, status: string, homeScore: number | null, awayScore: number | null) {
+export async function updateMatchAction(
+  matchId: number, 
+  status: string, 
+  homeScore: number | null, 
+  awayScore: number | null,
+  winnerByPenaltiesTeamId?: number | null
+) {
   const supabaseAdmin = getAdminClient();
 
   const { error } = await supabaseAdmin
@@ -30,7 +36,8 @@ export async function updateMatchAction(matchId: number, status: string, homeSco
     .update({
       status,
       home_score: homeScore,
-      away_score: awayScore
+      away_score: awayScore,
+      winner_by_penalties_team_id: winnerByPenaltiesTeamId || null
     })
     .eq('id', matchId);
 

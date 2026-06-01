@@ -59,7 +59,7 @@ export function LandingHero() {
               </div>
               <h3 className="text-xl font-bold">Acierta y Suma</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Gana 3 puntos por resultado exacto, 2 por diferencia de goles o 1 por acertar el ganador. Cada detalle cuenta para llegar a la cima.
+                Gana 5 puntos por resultado exacto, 3 por diferencia de goles o 1 por acertar el ganador. Cada detalle cuenta para llegar a la cima.
               </p>
             </div>
 

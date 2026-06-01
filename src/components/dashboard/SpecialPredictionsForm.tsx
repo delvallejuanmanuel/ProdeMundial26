@@ -22,7 +22,6 @@ interface SpecialPrediction {
   champion_team_id: number | null;
   runner_up_team_id: number | null;
   top_scorer_player_id: number | null;
-  disappointment_team_id: number | null;
   suggested_top_scorer: string | null;
 }
 
@@ -49,7 +48,6 @@ export function SpecialPredictionsForm({
     initialPrediction?.top_scorer_player_id?.toString() || (initialPrediction?.suggested_top_scorer ? 'other' : '')
   );
   const [suggestedScorer, setSuggestedScorer] = useState<string>(initialPrediction?.suggested_top_scorer || '');
-  const [disappointment, setDisappointment] = useState<string>(initialPrediction?.disappointment_team_id?.toString() || '');
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -70,7 +68,6 @@ export function SpecialPredictionsForm({
       champion_team_id: champion ? parseInt(champion) : null,
       runner_up_team_id: runnerUp ? parseInt(runnerUp) : null,
       top_scorer_player_id: topScorer && topScorer !== 'other' ? parseInt(topScorer) : null,
-      disappointment_team_id: disappointment ? parseInt(disappointment) : null,
       suggested_top_scorer: topScorer === 'other' ? suggestedScorer : null,
     };
 
@@ -101,7 +98,7 @@ export function SpecialPredictionsForm({
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Campeón */}
         <div className={`bg-card border border-border/50 rounded-2xl p-6 shadow-xl relative overflow-hidden group ${hasPaid ? 'hover:border-primary/50' : 'opacity-80 grayscale-[20%]'}`}>
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-primary/20"></div>
@@ -172,26 +169,6 @@ export function SpecialPredictionsForm({
               className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50 mt-2"
             />
           )}
-        </div>
-
-        {/* Decepción */}
-        <div className={`bg-card border border-border/50 rounded-2xl p-6 shadow-xl relative overflow-hidden group ${hasPaid ? 'hover:border-primary/50' : 'opacity-80 grayscale-[20%]'}`}>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-red-500/10 rounded-full blur-3xl -mr-16 -mt-16 transition-all group-hover:bg-red-500/20"></div>
-          <HeartCrack className="w-8 h-8 text-red-500 mb-4" />
-          <h3 className="font-bold text-lg mb-1">La Decepción</h3>
-          <p className="text-xs text-muted-foreground mb-4">+5 Puntos (Equipo candidato que no pase Fase de Grupos)</p>
-          
-          <select 
-            disabled={!hasPaid || isSaving || isLocked}
-            value={disappointment}
-            onChange={(e) => setDisappointment(e.target.value)}
-            className="w-full bg-background border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none disabled:opacity-50"
-          >
-            <option value="">Seleccionar Equipo...</option>
-            {teams.map(t => (
-              <option key={t.id} value={t.id}>{t.name}</option>
-            ))}
-          </select>
         </div>
       </div>
 

@@ -24,7 +24,6 @@ export function SpecialResultsForm() {
   const [champion, setChampion] = useState<string>('');
   const [runnerUp, setRunnerUp] = useState<string>('');
   const [topScorer, setTopScorer] = useState<string>('');
-  const [disappointment, setDisappointment] = useState<string>('');
   
   const [isCalculating, setIsCalculating] = useState(false);
   const [calcResult, setCalcResult] = useState<string | null>(null);
@@ -43,7 +42,7 @@ export function SpecialResultsForm() {
   }, []);
 
   const handleCalculate = async () => {
-    if (!champion || !runnerUp || !topScorer || !disappointment) {
+    if (!champion || !runnerUp || !topScorer) {
       alert("Debes seleccionar a todos los ganadores reales antes de calcular.");
       return;
     }
@@ -59,8 +58,7 @@ export function SpecialResultsForm() {
     const { data, error } = await supabase.rpc('calculate_special_points', {
       actual_champion_id: parseInt(champion),
       actual_runner_up_id: parseInt(runnerUp),
-      actual_top_scorer_id: parseInt(topScorer),
-      actual_disappointment_id: parseInt(disappointment)
+      actual_top_scorer_id: parseInt(topScorer)
     });
 
     setIsCalculating(false);
@@ -82,7 +80,7 @@ export function SpecialResultsForm() {
           Al finalizar el Mundial, selecciona quiénes fueron los ganadores reales para repartir los puntos extra a los usuarios.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Campeón */}
           <div className="space-y-2">
             <label className="text-sm font-bold flex items-center gap-2">
@@ -127,26 +125,11 @@ export function SpecialResultsForm() {
               {players.map(p => <option key={p.id} value={p.id} className="bg-card text-card-foreground">{p.name}</option>)}
             </select>
           </div>
-
-          {/* Decepción */}
-          <div className="space-y-2">
-            <label className="text-sm font-bold flex items-center gap-2">
-              <HeartCrack className="w-4 h-4 text-red-500" /> Decepción Real
-            </label>
-            <select 
-              value={disappointment}
-              onChange={(e) => setDisappointment(e.target.value)}
-              className="w-full bg-card text-card-foreground border border-border/50 rounded-lg p-3 text-sm focus:ring-2 focus:ring-primary outline-none"
-            >
-              <option value="" className="bg-card text-card-foreground">Seleccionar...</option>
-              {teams.map(t => <option key={t.id} value={t.id} className="bg-card text-card-foreground">{t.name}</option>)}
-            </select>
-          </div>
         </div>
 
         <div className="border-t border-border/20 pt-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-xs text-muted-foreground max-w-sm">
-            Esto sumará +10 (Campeón), +5 (Subcampeón), +7 (Goleador) y +5 (Decepción) a los usuarios que hayan acertado.
+            Esto sumará +10 (Campeón), +5 (Subcampeón) y +7 (Goleador) a los usuarios que hayan acertado.
           </div>
           <Button 
             onClick={handleCalculate}

@@ -24,6 +24,9 @@ export default async function FixturePage() {
       phase,
       home_score,
       away_score,
+      home_team_id,
+      away_team_id,
+      winner_by_penalties_team_id,
       home_team:teams!home_team_id (name, flag),
       away_team:teams!away_team_id (name, flag)
     `)
@@ -43,7 +46,7 @@ export default async function FixturePage() {
   // Fetch user predictions
   const { data: userPredictions } = await supabase
     .from('predictions')
-    .select('match_id, predicted_home_score, predicted_away_score, awarded_points')
+    .select('match_id, predicted_home_score, predicted_away_score, predicted_penalties_winner_team_id, awarded_points')
     .eq('user_id', user.id);
     
   const predictions = userPredictions || [];

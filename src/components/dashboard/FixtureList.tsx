@@ -11,6 +11,8 @@ interface Match {
   phase: string;
   home_score: number | null;
   away_score: number | null;
+  home_team_id?: number | null;
+  away_team_id?: number | null;
   home_team: { name: string; flag: string } | null;
   away_team: { name: string; flag: string } | null;
   home_team_placeholder?: string | null;
@@ -21,6 +23,7 @@ interface Prediction {
   match_id: number;
   predicted_home_score: number | null;
   predicted_away_score: number | null;
+  predicted_penalties_winner_team_id?: number | null;
   awarded_points: number | null;
 }
 
@@ -142,6 +145,8 @@ export function FixtureList({
                       awayTeam={match.away_team?.name || match.away_team_placeholder || 'Por definir'} 
                       homeFlag={match.home_team?.flag || '❓'} 
                       awayFlag={match.away_team?.flag || '❓'} 
+                      homeTeamId={match.home_team_id}
+                      awayTeamId={match.away_team_id}
                       matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
                       matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} 
                       groupName={match.phase.toUpperCase()} 
@@ -153,6 +158,7 @@ export function FixtureList({
                       awardedPoints={userPrediction?.awarded_points}
                       initialHomeScore={userPrediction?.predicted_home_score}
                       initialAwayScore={userPrediction?.predicted_away_score}
+                      initialPenaltiesWinner={userPrediction?.predicted_penalties_winner_team_id}
                       kickoffTime={match.kickoff_time}
                     />
                   );

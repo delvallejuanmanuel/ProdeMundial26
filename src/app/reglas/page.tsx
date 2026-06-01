@@ -29,12 +29,17 @@ export default async function ReglasPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground text-sm leading-relaxed">
-            <p>El costo de inscripción total del Prode se divide en dos fases: Fase de Grupos y Eliminatorias. Todo lo recaudado forma el <strong>Pozo Acumulado</strong>.</p>
+            <p>El costo de inscripción total del Prode se divide en dos tramos (que pueden abonarse como 2 cuotas de $20.000 ARS o un pago único bonificado de $40.000 ARS). Todo lo recaudado forma el <strong>Pozo Acumulado</strong>.</p>
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <h4 className="font-bold text-foreground mb-2">Distribución del Pozo:</h4>
               <ul className="list-disc list-inside space-y-1">
-                <li><strong className="text-foreground">30% del Pozo Total (Fase de Grupos):</strong> Este porcentaje se divide en 3 premios iguales (10% cada uno) para los jugadores que sumen más puntos en cada una de las fechas individuales (Ganador Fecha 1, Ganador Fecha 2 y Ganador Fecha 3).</li>
-                <li><strong className="text-foreground">70% del Pozo Total:</strong> Premio <strong>Global</strong>. Se otorga al jugador que sume la mayor cantidad de puntos a lo largo de <strong>todo el torneo</strong> (Fase de Grupos + Eliminatorias + Final).</li>
+                <li><strong className="text-foreground">30% del Pozo Total (Fase de Grupos):</strong> Se divide en 3 premios iguales (10% cada uno) para los jugadores que sumen más puntos en cada una de las fechas de grupos (Ganador Fecha 1, Ganador Fecha 2 y Ganador Fecha 3).</li>
+                <li><strong className="text-foreground">70% del Pozo Total (Premio Global):</strong> Se otorga al final del torneo a los jugadores con más puntos acumulados en la general:
+                  <ul className="list-disc list-inside ml-6 mt-1 space-y-0.5">
+                    <li><strong className="text-foreground">70% de este pozo (49% del total):</strong> Para el <strong>Campeón del Prode (1° puesto)</strong>.</li>
+                    <li><strong className="text-foreground">30% de este pozo (21% del total):</strong> Para el <strong>Subcampeón del Prode (2° puesto)</strong>.</li>
+                  </ul>
+                </li>
               </ul>
             </div>
             <p className="text-xs italic">* En caso de empate en el primer puesto de cualquiera de los premios, el monto correspondiente se dividirá en partes iguales entre los ganadores.</p>
@@ -50,19 +55,23 @@ export default async function ReglasPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground text-sm leading-relaxed">
-            <p>Por cada partido podrás predecir el resultado exacto. Dependiendo de tu acierto, sumarás diferentes puntos:</p>
+            <p>Por cada partido podrás predecir el resultado. Dependiendo de tu acierto, sumarás diferentes puntos:</p>
             <ul className="list-none space-y-3">
               <li className="flex items-start gap-2">
                 <span className="bg-green-500/20 text-green-500 font-bold px-2 py-0.5 rounded text-xs mt-0.5">+5 pts</span>
-                <span><strong>Acierto Exacto:</strong> Acertaste el resultado exacto del partido (ej: Predijiste 2-1 y salió 2-1).</span>
+                <span><strong>Acierto Exacto (Pleno):</strong> Acertaste el resultado exacto del partido (ej: Predijiste 2-1 y salió 2-1).</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="bg-yellow-500/20 text-yellow-500 font-bold px-2 py-0.5 rounded text-xs mt-0.5">+3 pts</span>
-                <span><strong>Acierto de Diferencia / Empate:</strong> Acertaste al ganador y la diferencia de goles (ej: Predijiste 3-1 y salió 2-0, diferencia de +2) O acertaste que era un empate pero con distintos goles (ej: Predijiste 1-1 y salió 0-0).</span>
+                <span><strong>Diferencia de Goles:</strong> Acertaste al ganador y la diferencia de goles (ej: Predijiste 3-1 y salió 2-0, diferencia de +2) O acertaste que era un empate pero con distintos goles (ej: Predijiste 1-1 y salió 0-0).</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="bg-blue-500/20 text-blue-500 font-bold px-2 py-0.5 rounded text-xs mt-0.5">+1 pt</span>
                 <span><strong>Acierto de Tendencia:</strong> Acertaste al equipo ganador, pero no la diferencia de goles (ej: Predijiste 1-0 y salió 3-0).</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs mt-0.5">+5 pts</span>
+                <span><strong>Pleno en Penales (Playoffs):</strong> En partidos de eliminatoria, si predices un empate y además aciertas quién avanza en la tanda de penales, obtienes un **Acierto Pleno (5 puntos)** directos. Si erras el ganador de la tanda, sumas 0 puntos.</span>
               </li>
             </ul>
 
@@ -80,11 +89,7 @@ export default async function ReglasPage() {
               </li>
               <li className="flex items-center gap-2">
                 <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs">+7 pts</span>
-                <span><strong>Goleador del Torneo:</strong> Acertar el máximo anotador de la competición.</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs">+5 pts</span>
-                <span><strong>Decepción del Torneo:</strong> Acertar un equipo "candidato" que quede eliminado en la Fase de Grupos.</span>
+                <span><strong>Goleador del Torneo (Bota de Oro):</strong> Acertar el máximo anotador de la competición.</span>
               </li>
             </ul>
           </CardContent>
@@ -100,11 +105,11 @@ export default async function ReglasPage() {
           </CardHeader>
           <CardContent className="space-y-2 text-muted-foreground text-sm leading-relaxed">
             <ul className="list-disc list-inside space-y-2">
-              <li><strong>Plazos:</strong> Las predicciones pueden guardarse y modificarse libremente <strong>hasta la hora exacta del comienzo de cada partido</strong>. Una vez que el partido inicia, la predicción se bloquea y no puede alterarse.</li>
-              <li><strong>Alargues:</strong> Para los partidos de <strong>eliminatorias</strong>, el resultado que cuenta para los puntos es el de los <strong>90 minutos reglamentarios + el alargue (120 minutos)</strong>. No se cuentan los penales para el resultado de goles.</li>
+              <li><strong>Plazos de Partidos:</strong> Las predicciones se bloquean estrictamente **1 hora antes del inicio programado** de cada encuentro.</li>
+              <li><strong>Plazos Especiales:</strong> Los pronósticos especiales se bloquean definitivamente al **inicio exacto del partido inaugural** de la Copa del Mundo.</li>
+              <li><strong>Alargues:</strong> Para los partidos de <strong>eliminatorias</strong>, el resultado que cuenta para los goles es el de los <strong>90 minutos reglamentarios + el alargue (120 minutos)</strong>. Los penales solo definen el bono de avance cuando hay empate.</li>
               <li><strong>Empates en Posiciones:</strong> En caso de empate en puntos totales en la tabla de posiciones, el criterio de desempate será: mayor cantidad de "Plenos" (aciertos exactos), luego mayor cantidad de puntos por "Pronósticos Especiales".</li>
-              <li><strong>Administración:</strong> Las decisiones del administrador (como la carga final de resultados) son definitivas. Ante cualquier disputa o error en el sistema, el administrador tiene la autoridad final para resolver la discrepancia.</li>
-              <li><strong>Fuerza Mayor:</strong> En caso de suspensión o cancelación de un partido, se determinará la conducta a seguir según la resolución oficial de la FIFA.</li>
+              <li><strong>Administración y Pagos:</strong> El administrador es el único facultado para validar y activar los permisos en la base de datos de manera definitiva. Las decisiones sobre la carga de resultados son definitivas.</li>
             </ul>
           </CardContent>
         </Card>

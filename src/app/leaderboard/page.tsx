@@ -4,6 +4,8 @@ import { createClient } from '@/utils/supabase/server';
 import { Trophy, Medal, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
+import { UserPerformanceTooltip } from '@/components/dashboard/UserPerformanceTooltip';
+
 export const dynamic = 'force-dynamic';
 
 export default async function LeaderboardPage() {
@@ -44,8 +46,8 @@ export default async function LeaderboardPage() {
                   <th className="px-4 py-4 font-bold w-12">Pos</th>
                   <th className="px-4 py-4 font-bold min-w-[150px]">Jugador</th>
                   <th className="px-3 py-4 font-bold text-center" title="Partidos Jugados">PJ</th>
-                  <th className="px-3 py-4 font-bold text-center text-green-500" title="Resultado Exacto (3 pts)">Plenos</th>
-                  <th className="px-3 py-4 font-bold text-center text-blue-500" title="Diferencia de Goles (2 pts)">Dif. Goles</th>
+                  <th className="px-3 py-4 font-bold text-center text-green-500" title="Resultado Exacto (5 pts)">Plenos</th>
+                  <th className="px-3 py-4 font-bold text-center text-blue-500" title="Diferencia de Goles (3 pts)">Dif. Goles</th>
                   <th className="px-3 py-4 font-bold text-center text-yellow-500" title="Ganador/Empate (1 pt)">Resultado</th>
                   <th className="px-3 py-4 font-bold text-center text-red-500" title="Sin Puntos (0 pts)">Errados</th>
                   <th className="px-3 py-4 font-bold text-center text-purple-500" title="Puntos por pronósticos especiales">Especiales</th>
@@ -67,13 +69,15 @@ export default async function LeaderboardPage() {
                          isThird ? <Medal className="w-5 h-5 text-amber-700" /> : 
                          <span className="pl-1">{index + 1}</span>}
                       </td>
-                      <td className="px-4 py-3 font-medium flex items-center gap-2">
-                        <span className="truncate max-w-[120px] sm:max-w-xs">{user.nickname || user.name}</span>
-                        {isIneligible && (
-                          <Badge variant="destructive" className="text-[10px] h-5 hidden md:flex items-center gap-1 shrink-0">
-                            <AlertCircle className="w-3 h-3" /> Fuera de Premio
-                          </Badge>
-                        )}
+                      <td className="px-4 py-3 font-medium">
+                        <UserPerformanceTooltip userId={user.user_id} userName={user.nickname || user.name}>
+                          <span className="truncate max-w-[120px] sm:max-w-xs block">{user.nickname || user.name}</span>
+                          {isIneligible && (
+                            <Badge variant="destructive" className="text-[10px] h-5 hidden md:flex items-center gap-1 shrink-0 ml-2">
+                              <AlertCircle className="w-3 h-3" /> Fuera de Premio
+                            </Badge>
+                          )}
+                        </UserPerformanceTooltip>
                       </td>
                       <td className="px-3 py-3 text-center font-medium">{user.matches_played ?? 0}</td>
                       <td className="px-3 py-3 text-center font-medium text-green-400">{user.exact_matches ?? 0}</td>

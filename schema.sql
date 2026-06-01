@@ -64,7 +64,6 @@ CREATE TABLE IF NOT EXISTS public.special_predictions (
   champion_team_id integer REFERENCES public.teams(id),
   runner_up_team_id integer REFERENCES public.teams(id),
   top_scorer_player_id integer REFERENCES public.players(id),
-  disappointment_team_id integer REFERENCES public.teams(id),
   awarded_points integer DEFAULT 0,
   UNIQUE(user_id)
 );

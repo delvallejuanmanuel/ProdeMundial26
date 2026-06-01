@@ -23,6 +23,9 @@ export function MatchesTable() {
         phase,
         home_score,
         away_score,
+        home_team_id,
+        away_team_id,
+        winner_by_penalties_team_id,
         home_team:teams!home_team_id (name, flag),
         away_team:teams!away_team_id (name, flag)
       `)
@@ -45,14 +48,22 @@ export function MatchesTable() {
   };
 
   const handleSaveMatch = async (match: any) => {
+    const isPlayoff = !match.phase.toLowerCase().startsWith('grupo');
+    const isTie = match.home_score !== '' && match.away_score !== '' && Number(match.home_score) === Number(match.away_score);
+    if (isPlayoff && isTie && !match.winner_by_penalties_team_id) {
+      alert("Para empates en playoffs, debes indicar qué equipo ganó por penales.");
+      return;
+    }
+
     setSavingId(match.id);
     try {
       const { updateMatchAction } = await import('@/app/admin/actions');
       await updateMatchAction(
         match.id, 
         match.status, 
-        match.home_score === '' ? null : match.home_score, 
-        match.away_score === '' ? null : match.away_score
+        match.home_score === '' ? null : Number(match.home_score), 
+        match.away_score === '' ? null : Number(match.away_score),
+        isPlayoff && isTie ? Number(match.winner_by_penalties_team_id) : null
       );
     } catch (error: any) {
       alert("Error al actualizar partido: " + error.message);
@@ -113,8 +124,8 @@ export function MatchesTable() {
         )}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-t border-border/20 pt-4">
           <div className="text-xs text-muted-foreground flex flex-wrap gap-4">
-            <span><strong className="text-primary">3 pts</strong> = Resultado exacto</span>
-            <span><strong className="text-primary">2 pts</strong> = Diferencia de goles</span>
+            <span><strong className="text-primary">5 pts</strong> = Resultado exacto</span>
+            <span><strong className="text-primary">3 pts</strong> = Diferencia de goles</span>
             <span><strong className="text-primary">1 pt</strong> = Acertar ganador/empate</span>
           </div>
           
@@ -146,6 +157,8 @@ export function MatchesTable() {
             <tbody>
               {filteredMatches.length > 0 ? filteredMatches.map(match => {
                 const date = new Date(match.kickoff_time);
+                const isPlayoff = !match.phase.toLowerCase().startsWith('grupo');
+                const isTie = match.home_score !== '' && match.away_score !== '' && Number(match.home_score) === Number(match.away_score);
                 return (
                   <tr key={match.id} className="border-b border-border/20 hover:bg-muted/50 transition-colors">
                     <td className="px-4 py-3">
@@ -162,22 +175,48 @@ export function MatchesTable() {
                         )}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-center flex items-center justify-center gap-2">
-                      <Input 
-                        type="number" 
-                        min="0"
-                        className="w-16 text-center" 
-                        value={match.home_score ?? ''} 
-                        onChange={(e) => handleUpdateMatch(match.id, 'home_score', e.target.value)}
-                      />
-                      <span>-</span>
-                      <Input 
-                        type="number" 
-                        min="0"
-                        className="w-16 text-center" 
-                        value={match.away_score ?? ''} 
-                        onChange={(e) => handleUpdateMatch(match.id, 'away_score', e.target.value)}
-                      />
+                    <td className="px-4 py-3 text-center">
+                      <div className="flex flex-col items-center justify-center gap-1">
+                        <div className="flex items-center justify-center gap-2">
+                          <Input 
+                            type="number" 
+                            min="0"
+                            className="w-16 text-center" 
+                            value={match.home_score ?? ''} 
+                            onChange={(e) => {
+                              handleUpdateMatch(match.id, 'home_score', e.target.value);
+                              if (e.target.value !== match.away_score) {
+                                handleUpdateMatch(match.id, 'winner_by_penalties_team_id', null);
+                              }
+                            }}
+                          />
+                          <span>-</span>
+                          <Input 
+                            type="number" 
+                            min="0"
+                            className="w-16 text-center" 
+                            value={match.away_score ?? ''} 
+                            onChange={(e) => {
+                              handleUpdateMatch(match.id, 'away_score', e.target.value);
+                              if (e.target.value !== match.home_score) {
+                                handleUpdateMatch(match.id, 'winner_by_penalties_team_id', null);
+                              }
+                            }}
+                          />
+                        </div>
+                        
+                        {isPlayoff && isTie && (
+                          <select
+                            value={match.winner_by_penalties_team_id ?? ''}
+                            onChange={(e) => handleUpdateMatch(match.id, 'winner_by_penalties_team_id', e.target.value ? Number(e.target.value) : null)}
+                            className="bg-background text-foreground border border-border/50 rounded px-1.5 py-0.5 text-xs outline-none focus:ring-1 focus:ring-primary mt-1 w-32"
+                          >
+                            <option value="">Ganador Penales...</option>
+                            <option value={match.home_team_id}>{match.home_team?.name || 'Local'}</option>
+                            <option value={match.away_team_id}>{match.away_team?.name || 'Visitante'}</option>
+                          </select>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 font-medium">
                       <div className="flex items-center justify-start gap-2">

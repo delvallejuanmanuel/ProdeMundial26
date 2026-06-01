@@ -65,7 +65,7 @@ export default async function SpecialPredictionsPage() {
           <h1 className="text-3xl font-black tracking-tight flex items-center justify-center md:justify-start gap-2">
             <Star className="w-8 h-8 text-primary" /> Pronósticos Especiales
           </h1>
-          <p className="text-muted-foreground">Suma puntos extra al finalizar el Mundial prediciendo estos 4 hitos clave. ¡Elegí con sabiduría!</p>
+          <p className="text-muted-foreground">Suma puntos extra al finalizar el Mundial prediciendo estos 3 hitos clave. ¡Elegí con sabiduría!</p>
         </div>
 
         <SpecialPredictionsForm 

@@ -44,6 +44,9 @@ export default async function Home() {
       phase,
       home_score,
       away_score,
+      home_team_id,
+      away_team_id,
+      winner_by_penalties_team_id,
       home_team:teams!home_team_id (name, flag),
       away_team:teams!away_team_id (name, flag),
       home_team_placeholder,
@@ -67,7 +70,7 @@ export default async function Home() {
   // Fetch user predictions
   const { data: userPredictions } = await supabase
     .from('predictions')
-    .select('match_id, predicted_home_score, predicted_away_score, awarded_points')
+    .select('match_id, predicted_home_score, predicted_away_score, predicted_penalties_winner_team_id, awarded_points')
     .eq('user_id', user.id);
     
   const predictions = userPredictions || [];
@@ -177,6 +180,8 @@ export default async function Home() {
                     awayTeam={match.away_team?.name || match.away_team_placeholder || 'Por definir'} 
                     homeFlag={match.home_team?.flag || '❓'} 
                     awayFlag={match.away_team?.flag || '❓'} 
+                    homeTeamId={match.home_team_id}
+                    awayTeamId={match.away_team_id}
                     matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
                     matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} 
                     groupName={match.phase.toUpperCase()} 
@@ -188,6 +193,7 @@ export default async function Home() {
                     awardedPoints={userPrediction?.awarded_points}
                     initialHomeScore={userPrediction?.predicted_home_score}
                     initialAwayScore={userPrediction?.predicted_away_score}
+                    initialPenaltiesWinner={userPrediction?.predicted_penalties_winner_team_id}
                     kickoffTime={match.kickoff_time}
                   />
                 );
