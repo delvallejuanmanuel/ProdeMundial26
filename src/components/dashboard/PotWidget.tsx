@@ -53,10 +53,21 @@ export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0 }: PotWi
                 <p className="text-xl font-black text-primary">${(phasePrize / 3).toLocaleString('es-AR')}</p>
                 <p className="text-[9px] text-muted-foreground mt-1 text-center leading-tight">Fechas 1, 2 y 3</p>
               </div>
-              <div className="bg-background/50 rounded-xl p-3 border border-primary/20 text-center relative overflow-hidden">
+              <div className="bg-background/50 rounded-xl p-3 border border-primary/20 text-center relative overflow-hidden flex flex-col justify-center gap-1">
                 <div className="absolute inset-0 bg-primary/5"></div>
-                <p className="text-[10px] font-semibold text-primary/80 uppercase tracking-wider mb-1 relative">Premio Global (70%)</p>
+                <p className="text-[10px] font-semibold text-primary/80 uppercase tracking-wider relative">Premio Global (70%)</p>
                 <p className="text-xl font-black text-primary relative">${globalPrize.toLocaleString('es-AR')}</p>
+                <div className="w-full h-px bg-primary/10 relative my-0.5"></div>
+                <div className="text-[9px] text-muted-foreground relative flex flex-col gap-0.5">
+                  <div className="flex justify-between px-1">
+                    <span>1° (70%):</span>
+                    <span className="font-bold text-foreground">${(globalPrize * 0.7).toLocaleString('es-AR')}</span>
+                  </div>
+                  <div className="flex justify-between px-1">
+                    <span>2° (30%):</span>
+                    <span className="font-bold text-foreground">${(globalPrize * 0.3).toLocaleString('es-AR')}</span>
+                  </div>
+                </div>
               </div>
             </div>
 

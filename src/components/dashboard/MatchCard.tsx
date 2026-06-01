@@ -198,14 +198,15 @@ export function MatchCard({
         {isPlayoff && isTie && (
           <div className="mt-4 pt-4 border-t border-border/20 space-y-2 animate-in slide-in-from-top-2 duration-200">
             <p className="text-xs font-bold text-center text-muted-foreground uppercase tracking-wider">
-              ¿Quién avanza por penales?
+              ¿Quién avanza? (Penales o suplementario)
             </p>
             <div className="flex gap-4 justify-center">
               <button
+                type="button"
                 disabled={isLocked || isSaving}
                 onClick={() => setPenaltiesWinner(homeTeamId ?? '')}
                 className={`flex-1 py-2 px-3 text-sm font-bold rounded-lg border transition-all ${
-                  penaltiesWinner === homeTeamId
+                  (penaltiesWinner !== '' && Number(penaltiesWinner) === Number(homeTeamId))
                     ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(130,255,145,0.2)]'
                     : 'bg-background border-border hover:bg-secondary/40 text-muted-foreground'
                 }`}
@@ -213,10 +214,11 @@ export function MatchCard({
                 {homeTeam}
               </button>
               <button
+                type="button"
                 disabled={isLocked || isSaving}
                 onClick={() => setPenaltiesWinner(awayTeamId ?? '')}
                 className={`flex-1 py-2 px-3 text-sm font-bold rounded-lg border transition-all ${
-                  penaltiesWinner === awayTeamId
+                  (penaltiesWinner !== '' && Number(penaltiesWinner) === Number(awayTeamId))
                     ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(130,255,145,0.2)]'
                     : 'bg-background border-border hover:bg-secondary/40 text-muted-foreground'
                 }`}
@@ -238,7 +240,7 @@ export function MatchCard({
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-muted-foreground uppercase tracking-wider">Ganador Penales Real</span>
                 <span className="font-bold text-foreground">
-                  {winnerByPenaltiesTeamId === homeTeamId ? homeTeam : awayTeam}
+                  {Number(winnerByPenaltiesTeamId) === Number(homeTeamId) ? homeTeam : awayTeam}
                 </span>
               </div>
             )}
@@ -246,8 +248,8 @@ export function MatchCard({
             {initialPenaltiesWinner && (
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-muted-foreground uppercase tracking-wider">Tu Elegido Penales</span>
-                <span className={`font-bold ${initialPenaltiesWinner === winnerByPenaltiesTeamId ? 'text-green-500' : 'text-red-500'}`}>
-                  {initialPenaltiesWinner === homeTeamId ? homeTeam : awayTeam}
+                <span className={`font-bold ${Number(initialPenaltiesWinner) === Number(winnerByPenaltiesTeamId) ? 'text-green-500' : 'text-red-500'}`}>
+                  {Number(initialPenaltiesWinner) === Number(homeTeamId) ? homeTeam : awayTeam}
                 </span>
               </div>
             )}
