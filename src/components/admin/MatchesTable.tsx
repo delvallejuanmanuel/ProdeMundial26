@@ -8,6 +8,7 @@ import { Loader2 } from 'lucide-react';
 
 export function MatchesTable() {
   const [matches, setMatches] = useState<any[]>([]);
+  const [teams, setTeams] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [savingId, setSavingId] = useState<number | null>(null);
   const supabase = createClient();
@@ -36,6 +37,10 @@ export function MatchesTable() {
     } else {
       setMatches(data || []);
     }
+    
+    const { data: teamsData } = await supabase.from('teams').select('id, name').order('name');
+    if (teamsData) setTeams(teamsData);
+
     setIsLoading(false);
   };
 
@@ -63,7 +68,9 @@ export function MatchesTable() {
         match.status, 
         match.home_score === '' ? null : Number(match.home_score), 
         match.away_score === '' ? null : Number(match.away_score),
-        isPlayoff && isTie ? Number(match.winner_by_penalties_team_id) : null
+        isPlayoff && isTie ? Number(match.winner_by_penalties_team_id) : null,
+        isPlayoff ? match.home_team_id : undefined,
+        isPlayoff ? match.away_team_id : undefined
       );
     } catch (error: any) {
       alert("Error al actualizar partido: " + error.message);
@@ -166,14 +173,27 @@ export function MatchesTable() {
                       <div className="text-xs text-muted-foreground">{date.toLocaleDateString('es-AR', { timeZone: 'UTC' })} {date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute:'2-digit' })}</div>
                     </td>
                     <td className="px-4 py-3 text-right font-medium">
-                      <div className="flex items-center justify-end gap-2">
-                        {match.home_team?.name || 'TBD'}
-                        {match.home_team?.flag && (
-                          match.home_team.flag.startsWith('http') 
-                            ? <img src={match.home_team.flag} alt={match.home_team.name || ''} className="w-6 h-6 object-cover rounded-sm border border-border/50" />
-                            : <span>{match.home_team.flag}</span>
-                        )}
-                      </div>
+                      {isPlayoff ? (
+                        <select 
+                          className="bg-card text-card-foreground border border-border/50 rounded p-1.5 text-sm outline-none focus:ring-2 focus:ring-primary min-w-[120px]"
+                          value={match.home_team_id || ''}
+                          onChange={(e) => handleUpdateMatch(match.id, 'home_team_id', e.target.value ? Number(e.target.value) : null)}
+                        >
+                          <option value="">TBD</option>
+                          {teams.map(t => (
+                            <option key={t.id} value={t.id}>{t.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="flex items-center justify-end gap-2">
+                          {match.home_team?.name || 'TBD'}
+                          {match.home_team?.flag && (
+                            match.home_team.flag.startsWith('http') 
+                              ? <img src={match.home_team.flag} alt={match.home_team.name || ''} className="w-6 h-6 object-cover rounded-sm border border-border/50" />
+                              : <span>{match.home_team.flag}</span>
+                          )}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <div className="flex flex-col items-center justify-center gap-1">
@@ -219,14 +239,27 @@ export function MatchesTable() {
                       </div>
                     </td>
                     <td className="px-4 py-3 font-medium">
-                      <div className="flex items-center justify-start gap-2">
-                        {match.away_team?.flag && (
-                          match.away_team.flag.startsWith('http') 
-                            ? <img src={match.away_team.flag} alt={match.away_team.name || ''} className="w-6 h-6 object-cover rounded-sm border border-border/50" />
-                            : <span>{match.away_team.flag}</span>
-                        )}
-                        {match.away_team?.name || 'TBD'}
-                      </div>
+                      {isPlayoff ? (
+                        <select 
+                          className="bg-card text-card-foreground border border-border/50 rounded p-1.5 text-sm outline-none focus:ring-2 focus:ring-primary min-w-[120px]"
+                          value={match.away_team_id || ''}
+                          onChange={(e) => handleUpdateMatch(match.id, 'away_team_id', e.target.value ? Number(e.target.value) : null)}
+                        >
+                          <option value="">TBD</option>
+                          {teams.map(t => (
+                            <option key={t.id} value={t.id}>{t.name}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <div className="flex items-center justify-start gap-2">
+                          {match.away_team?.flag && (
+                            match.away_team.flag.startsWith('http') 
+                              ? <img src={match.away_team.flag} alt={match.away_team.name || ''} className="w-6 h-6 object-cover rounded-sm border border-border/50" />
+                              : <span>{match.away_team.flag}</span>
+                          )}
+                          {match.away_team?.name || 'TBD'}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <select 

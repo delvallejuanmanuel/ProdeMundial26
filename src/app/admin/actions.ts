@@ -27,18 +27,25 @@ export async function updateMatchAction(
   status: string, 
   homeScore: number | null, 
   awayScore: number | null,
-  winnerByPenaltiesTeamId?: number | null
+  winnerByPenaltiesTeamId?: number | null,
+  homeTeamId?: number | null,
+  awayTeamId?: number | null
 ) {
   const supabaseAdmin = getAdminClient();
 
+  const updateData: any = {
+    status,
+    home_score: homeScore,
+    away_score: awayScore,
+    winner_by_penalties_team_id: winnerByPenaltiesTeamId || null
+  };
+
+  if (homeTeamId !== undefined) updateData.home_team_id = homeTeamId;
+  if (awayTeamId !== undefined) updateData.away_team_id = awayTeamId;
+
   const { error } = await supabaseAdmin
     .from('matches')
-    .update({
-      status,
-      home_score: homeScore,
-      away_score: awayScore,
-      winner_by_penalties_team_id: winnerByPenaltiesTeamId || null
-    })
+    .update(updateData)
     .eq('id', matchId);
 
   if (error) throw new Error(error.message);
@@ -111,4 +118,62 @@ async function checkAndAdvanceGroup(matchId: number) {
   await supabaseAdmin.from('matches').update({
     [map.second.position === 'home' ? 'home_team_id' : 'away_team_id']: secondPlaceId
   }).eq('id', map.second.matchId);
+}
+
+export async function updateMatchTeamsAction(
+  matchId: number, 
+  homeTeamId: number | null, 
+  awayTeamId: number | null
+) {
+  const supabaseAdmin = getAdminClient();
+
+  const { error } = await supabaseAdmin
+    .from('matches')
+    .update({
+      home_team_id: homeTeamId,
+      away_team_id: awayTeamId
+    })
+    .eq('id', matchId);
+
+  if (error) throw new Error(error.message);
+
+  return { success: true };
+}
+
+export async function toggleChatBlockAction(userId: string, currentStatus: boolean) {
+  const supabaseAdmin = getAdminClient();
+  const { error } = await supabaseAdmin
+    .from('profiles')
+    .update({ chat_blocked: !currentStatus })
+    .eq('id', userId);
+  
+  if (error) throw new Error(error.message);
+  return { success: true };
+}
+
+export async function sendReminderEmailAction(email: string, name: string) {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('La API Key de Resend no está configurada.');
+  }
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: 'Prode Mundial <onboarding@resend.dev>',
+      to: email,
+      subject: '¡Falta poco! Cargá tus pronósticos del Prode',
+      html: `<p>Hola ${name || 'Jugador'},</p><p>Te recordamos que aún tenés pronósticos pendientes por cargar. ¡Apurate antes de que empiecen los partidos!</p><p>Ingresá ahora para completar tus predicciones.</p>`
+    })
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Error al enviar correo: ${errorText}`);
+  }
+
+  return { success: true };
 }
