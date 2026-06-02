@@ -44,7 +44,7 @@ export default function LoginPage() {
       if (error) {
         alert("Error al crear cuenta: " + error.message);
       } else {
-        alert("¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.");
+        alert("¡Cuenta creada exitosamente! Revisá tu correo electrónico y confirmá tu cuenta antes de iniciar sesión.");
         setIsLogin(true);
       }
     }
