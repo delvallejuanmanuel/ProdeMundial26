@@ -39,11 +39,6 @@ export function LandingHero() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/leaderboard">
-              <Button size="lg" variant="outline" className="h-14 px-8 text-lg font-bold border-border/50 hover:bg-secondary/50 backdrop-blur-md rounded-xl w-full sm:w-auto">
-                Ver Posiciones
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
