@@ -18,6 +18,7 @@ export default function GlobalChat() {
   const [newMessage, setNewMessage] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
   const [user, setUser] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +42,7 @@ export default function GlobalChat() {
       if (data) {
         setMessages(data.reverse());
       }
+      setIsLoading(false);
     };
     
     fetchUserAndMessages();
@@ -109,6 +111,8 @@ export default function GlobalChat() {
       .from('global_chat_messages')
       .insert({ user_id: user.id, content: msgContent });
   };
+
+  if (isLoading || !user) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">

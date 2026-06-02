@@ -27,9 +27,9 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
             <Button variant="ghost" size="icon" className="md:hidden" onClick={toggleMobileMenu}>
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="font-black text-xl tracking-tighter">
+            <Link href="/" className="font-black text-xl tracking-tighter hover:opacity-80 transition-opacity">
               PRODE<span className="text-primary">26</span>
-            </div>
+            </Link>
           </div>
 
           <div className="flex items-center gap-6">
@@ -50,8 +50,6 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
               </>
             ) : (
               <div className="hidden md:flex items-center gap-6 font-medium text-sm text-muted-foreground">
-                <Link href="/leaderboard" className="hover:text-primary transition-colors">Posiciones</Link>
-                <Link href="/estadisticas" className="hover:text-primary transition-colors">Estadísticas</Link>
                 <Link href="/reglas" className="hover:text-primary transition-colors">Reglas</Link>
               </div>
             )}
@@ -85,9 +83,9 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[60] bg-background/95 backdrop-blur-sm md:hidden flex flex-col">
           <div className="flex items-center justify-between px-4 h-16 border-b border-border/50">
-            <div className="font-black text-xl tracking-tighter">
+            <Link href="/" className="font-black text-xl tracking-tighter" onClick={toggleMobileMenu}>
               PRODE<span className="text-primary">26</span>
-            </div>
+            </Link>
             <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
               <X className="h-5 w-5" />
             </Button>
@@ -111,8 +109,6 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
               </>
             ) : (
               <>
-                <Link href="/leaderboard" className="text-lg font-medium" onClick={toggleMobileMenu}>Posiciones</Link>
-                <Link href="/estadisticas" className="text-lg font-medium" onClick={toggleMobileMenu}>Estadísticas</Link>
                 <Link href="/reglas" className="text-lg font-medium" onClick={toggleMobileMenu}>Reglas</Link>
                 <Link href="/login" className={buttonVariants({ variant: "default", className: "w-full mt-4" })} onClick={toggleMobileMenu}>
                   Ingresar

@@ -79,7 +79,7 @@ export function LandingHero() {
               </div>
               <h3 className="text-xl font-bold">Pronostica la Gloria</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Mira como la tabla de posiciones se actualiza al instante con cada gol. La gloria y el premio mayor esperan al mejor estratega.
+                Mira como la tabla de posiciones se actualiza varias veces al día con los últimos resultados. La gloria y el premio mayor esperan al mejor estratega.
               </p>
             </div>
 
