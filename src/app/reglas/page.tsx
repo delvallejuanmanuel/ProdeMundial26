@@ -29,7 +29,7 @@ export default async function ReglasPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground text-sm leading-relaxed">
-            <p>El costo de inscripción total del Prode se divide en dos tramos (que pueden abonarse como 2 cuotas de $20.000 ARS o un pago único bonificado de $40.000 ARS). Todo lo recaudado forma el <strong>Pozo Acumulado</strong>.</p>
+            <p>El costo de inscripción total del Prode se divide en dos tramos (que pueden abonarse como 2 cuotas de $20.000 ARS o un pago único unificado de $40.000 ARS). Todo lo recaudado forma el <strong>Pozo Acumulado</strong>.</p>
             <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <h4 className="font-bold text-foreground mb-2">Distribución del Pozo:</h4>
               <ul className="list-disc list-inside space-y-1">
