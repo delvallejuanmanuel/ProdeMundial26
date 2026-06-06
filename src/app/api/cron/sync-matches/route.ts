@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendEmail } from '@/lib/mailer';
 
 export async function GET(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -138,23 +139,15 @@ export async function GET(request: Request) {
   } catch (error: any) {
     console.error("Cron Job Error:", error);
     
-    if (process.env.RESEND_API_KEY && process.env.ALERT_EMAIL) {
+    if (process.env.ALERT_EMAIL) {
       try {
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            from: 'Prode Mundial <onboarding@resend.dev>',
-            to: process.env.ALERT_EMAIL,
-            subject: '[ALERTA CRÍTICA] Fallo en Prode Mundial Cronjob',
-            html: `<p>El cronjob de sincronización ha fallado.</p><p><strong>Error:</strong> ${error.message}</p>`
-          })
+        await sendEmail({
+          to: process.env.ALERT_EMAIL,
+          subject: '[ALERTA CRÍTICA] Fallo en Prode Mundial Cronjob',
+          html: `<p>El cronjob de sincronización ha fallado.</p><p><strong>Error:</strong> ${error.message}</p>`,
         });
-      } catch(e) {
-         console.error("Failed to send alert email", e);
+      } catch (mailErr) {
+        console.error('Error enviando alerta por email:', mailErr);
       }
     }
     
