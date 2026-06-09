@@ -40,14 +40,9 @@ export function UsersTable() {
     }
 
     // 2. Obtener usuarios y sus pronósticos
-    const { data: profiles, error } = await supabase
-      .from('profiles')
-      .select('*, predictions(match_id)')
-      .order('created_at', { ascending: false });
-    
-    if (error) {
-      console.error(error);
-    } else {
+    try {
+      const { getAdminUsersAction } = await import('@/app/admin/actions');
+      const profiles = await getAdminUsersAction();
       // 3. Calcular faltantes
       const processedUsers = (profiles || []).map((user: any) => {
         const userPreds = user.predictions || [];
@@ -66,6 +61,8 @@ export function UsersTable() {
         };
       });
       setUsers(processedUsers);
+    } catch (error) {
+      console.error(error);
     }
     setIsLoading(false);
   };

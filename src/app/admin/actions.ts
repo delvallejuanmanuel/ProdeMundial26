@@ -11,6 +11,17 @@ function getAdminClient() {
   return createAdminClient(url, key, { auth: { persistSession: false } });
 }
 
+export async function getAdminUsersAction() {
+  const supabaseAdmin = getAdminClient();
+  const { data, error } = await supabaseAdmin
+    .from('profiles')
+    .select('*, predictions(match_id)')
+    .order('created_at', { ascending: false });
+    
+  if (error) throw new Error(error.message);
+  return data;
+}
+
 export async function updatePlayerGoalsAction(playerId: number, goals: number) {
   const supabaseAdmin = getAdminClient();
   

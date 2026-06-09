@@ -41,6 +41,21 @@ export default function GlobalChat() {
       
       if (data) {
         setMessages(data.reverse());
+        
+        // Calcular mensajes no leídos iniciales
+        if (typeof window !== 'undefined') {
+          const lastReadStr = localStorage.getItem('prode_chat_last_read');
+          if (lastReadStr) {
+            const lastRead = new Date(lastReadStr).getTime();
+            const unread = data.filter(m => new Date(m.created_at).getTime() > lastRead).length;
+            if (!isOpen) {
+              setUnreadCount(unread);
+            }
+          } else {
+            // Si nunca abrió el chat, marcamos todos como no leídos
+            setUnreadCount(data.length);
+          }
+        }
       }
       setIsLoading(false);
     };
@@ -75,6 +90,10 @@ export default function GlobalChat() {
         setIsOpen((currentIsOpen) => {
           if (!currentIsOpen) {
             setUnreadCount(prev => prev + 1);
+          } else {
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('prode_chat_last_read', new Date().toISOString());
+            }
           }
           return currentIsOpen;
         });
@@ -97,6 +116,9 @@ export default function GlobalChat() {
     setIsOpen(!isOpen);
     if (!isOpen) {
       setUnreadCount(0);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('prode_chat_last_read', new Date().toISOString());
+      }
     }
   };
 
