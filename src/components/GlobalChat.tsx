@@ -9,7 +9,7 @@ type ChatMessage = {
   user_id: string;
   content: string;
   created_at: string;
-  profiles?: { nickname: string };
+  profiles?: { nickname?: string, name?: string };
 };
 
 export default function GlobalChat() {
@@ -35,7 +35,7 @@ export default function GlobalChat() {
 
       const { data } = await supabase
         .from('global_chat_messages')
-        .select('*, profiles(nickname)')
+        .select('*, profiles(nickname, name)')
         .order('created_at', { ascending: false })
         .limit(50);
       
@@ -78,11 +78,11 @@ export default function GlobalChat() {
         // buscamos el nickname del usuario manualmente.
         const { data: profile } = await supabase
           .from('profiles')
-          .select('nickname')
+          .select('nickname, name')
           .eq('id', newMsg.user_id)
           .single();
           
-        newMsg.profiles = profile || { nickname: 'Usuario' };
+        newMsg.profiles = profile || { nickname: 'Usuario', name: 'Usuario' };
         
         setMessages(prev => [...prev, newMsg]);
         
@@ -163,7 +163,7 @@ export default function GlobalChat() {
                 return (
                   <div key={msg.id} className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}>
                     <span className="text-xs text-slate-500 mb-1 px-1">
-                      {isMine ? 'Tú' : msg.profiles?.nickname || 'Usuario'}
+                      {isMine ? 'Tú' : msg.profiles?.nickname || msg.profiles?.name || 'Usuario'}
                     </span>
                     <div className={`px-4 py-2.5 rounded-2xl max-w-[85%] text-sm shadow-sm ${isMine ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm border border-slate-100 dark:border-slate-700'}`}>
                       {msg.content}
