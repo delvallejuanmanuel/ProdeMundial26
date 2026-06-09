@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LandingHero } from '@/components/layout/LandingHero';
+import { SpecialsReminderPopup } from '@/components/dashboard/SpecialsReminderPopup';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,9 +103,21 @@ export default async function Home() {
     ? (leaderboard!.findIndex((u: any) => u.user_id === user.id) + 1) 
     : '-';
 
+  // Check if user has filled special predictions
+  const { data: specialPrediction } = await supabase
+    .from('special_predictions')
+    .select('id')
+    .eq('user_id', user.id)
+    .single();
+
+  const hasSpecialPredictions = !!specialPrediction;
+  const isTournamentStarted = new Date() > wcStartDate;
+  const showSpecialsReminder = !hasSpecialPredictions && !isTournamentStarted;
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <Header isAdmin={isAdmin} />
+      <SpecialsReminderPopup show={showSpecialsReminder} />
       
       <main className="flex-1 container mx-auto px-4 py-8 space-y-12">
         {(!hasPaidGroups || !hasPaidKnockouts) && (
