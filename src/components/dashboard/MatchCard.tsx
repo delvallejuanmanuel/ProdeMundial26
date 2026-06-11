@@ -55,8 +55,8 @@ export function MatchCard({
   winnerByPenaltiesTeamId = null
 }: MatchCardProps) {
   // Lock logic: 1 hour before kickoff
-  // Compensar +3 horas porque la base de datos almacena la hora ART como si fuera UTC
-  const adjustedKickoffTime = kickoffTime ? new Date(new Date(kickoffTime).getTime() + 3 * 60 * 60 * 1000) : null;
+  // La base de datos ya almacena en UTC, no hace falta compensar.
+  const adjustedKickoffTime = kickoffTime ? new Date(kickoffTime) : null;
   const isTimeLocked = adjustedKickoffTime ? adjustedKickoffTime.getTime() - new Date().getTime() <= 60 * 60 * 1000 : false;
   const isLocked = status !== 'pending' || !hasPaid || isTimeLocked;
   
@@ -110,7 +110,7 @@ export function MatchCard({
 
     if (error) {
       console.error(error);
-      alert("Error al guardar el pronóstico. ¿Has abonado la inscripción?");
+      alert("Error al guardar el pronóstico. Verifica que falte más de 1 hora para el partido y que tengas la inscripción abonada.");
     } else {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
