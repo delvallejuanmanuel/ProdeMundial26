@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { LandingHero } from '@/components/layout/LandingHero';
 import { SpecialsReminderPopup } from '@/components/dashboard/SpecialsReminderPopup';
+import { LiveMatchesWidget } from '@/components/dashboard/LiveMatchesWidget';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +57,22 @@ export default async function Home() {
     `)
     .gte('kickoff_time', startDate.toISOString())
     .lte('kickoff_time', next48h.toISOString())
+    .order('kickoff_time', { ascending: true });
+
+  // Fetch live matches
+  const { data: liveMatches } = await supabase
+    .from('matches')
+    .select(`
+      id,
+      kickoff_time,
+      status,
+      phase,
+      home_score,
+      away_score,
+      home_team:teams!home_team_id (name, flag),
+      away_team:teams!away_team_id (name, flag)
+    `)
+    .eq('status', 'in_play')
     .order('kickoff_time', { ascending: true });
 
   // Fetch user profile to check payment status
@@ -163,6 +180,11 @@ export default async function Home() {
                   <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Extras</span>
                 </div>
               </div>
+            )}
+
+            {/* Live Matches Widget */}
+            {liveMatches && liveMatches.length > 0 && (
+              <LiveMatchesWidget liveMatches={liveMatches} predictions={predictions} />
             )}
           </section>
 
