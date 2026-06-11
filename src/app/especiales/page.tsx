@@ -44,18 +44,9 @@ export default async function SpecialPredictionsPage() {
     .eq('user_id', user.id)
     .single();
 
-  // Fetch tournament start date
-  const { data: matchData } = await supabase
-    .from('matches')
-    .select('kickoff_time')
-    .order('kickoff_time', { ascending: true })
-    .limit(1)
-    .single();
-
-  const tournamentStart = matchData?.kickoff_time 
-    ? new Date(new Date(matchData.kickoff_time).getTime() + 3 * 60 * 60 * 1000) 
-    : null;
-  const isLocked = tournamentStart ? new Date() > tournamentStart : false;
+  // Fecha límite de especiales: Viernes 12 de Junio 2026 a las 23:59:59 ART (que equivale a 2026-06-13T02:59:59Z UTC)
+  const specialsDeadline = new Date('2026-06-13T02:59:59Z');
+  const isLocked = new Date() > specialsDeadline;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">

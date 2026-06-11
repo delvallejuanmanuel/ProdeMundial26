@@ -112,8 +112,9 @@ export default async function Home() {
     .single();
 
   const hasSpecialPredictions = !!specialPrediction;
-  const isTournamentStarted = new Date() > new Date(wcStartDate.getTime() + 3 * 60 * 60 * 1000);
-  const showSpecialsReminder = !hasSpecialPredictions && !isTournamentStarted;
+  const specialsDeadline = new Date('2026-06-13T02:59:59Z');
+  const isSpecialsDeadlinePassed = new Date() > specialsDeadline;
+  const showSpecialsReminder = !hasSpecialPredictions && !isSpecialsDeadlinePassed;
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
