@@ -219,8 +219,8 @@ export default async function Home() {
                     awayFlag={match.away_team?.flag || '❓'} 
                     homeTeamId={match.home_team_id}
                     awayTeamId={match.away_team_id}
-                    matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
-                    matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} 
+                    matchDate={date.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: 'short' })} 
+                    matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit' })} 
                     groupName={match.phase.toUpperCase()} 
                     status={match.status} 
                     userId={user.id}

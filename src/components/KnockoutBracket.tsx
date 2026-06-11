@@ -71,8 +71,8 @@ function MatchNode({ match, side }: { match?: Match, side?: 'left' | 'right' }) 
   const awayDisplay = match.away_name || placeholder.away;
   
   const d = new Date(match.kickoff_time);
-  const dateStr = d.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
-  const timeStr = d.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
+  const dateStr = d.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: '2-digit' });
+  const timeStr = d.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit' });
 
   return (
     <div className="w-[180px] bg-card border border-border/50 rounded-lg shadow-sm flex flex-col text-xs overflow-hidden shrink-0 transition-transform hover:scale-105">

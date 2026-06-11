@@ -111,7 +111,7 @@ export function FixtureList({
             filteredMatches.reduce((groups, match) => {
               const dateObj = new Date(match.kickoff_time);
               // Capitalize first letter of weekday and month
-              let dateStr = dateObj.toLocaleDateString('es-AR', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long' });
+              let dateStr = dateObj.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', weekday: 'long', day: 'numeric', month: 'long' });
               dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
               
               if (!groups[dateStr]) groups[dateStr] = [];
@@ -147,8 +147,8 @@ export function FixtureList({
                       awayFlag={match.away_team?.flag || '❓'} 
                       homeTeamId={match.home_team_id}
                       awayTeamId={match.away_team_id}
-                      matchDate={date.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: 'short' })} 
-                      matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })} 
+                      matchDate={date.toLocaleDateString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: 'short' })} 
+                      matchTime={date.toLocaleTimeString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires', hour: '2-digit', minute: '2-digit' })} 
                       groupName={match.phase.toUpperCase()} 
                       status={match.status} 
                       userId={userId}
