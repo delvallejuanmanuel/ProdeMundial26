@@ -273,13 +273,17 @@ export function MatchCard({
               className={`w-full font-bold transition-all shadow-lg ${
                 saveSuccess 
                   ? 'bg-green-500 hover:bg-green-600 text-white shadow-green-500/30' 
-                  : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(130,255,145,0.3)]'
+                  : (initialHomeScore !== null && initialAwayScore !== null)
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30'
+                    : 'bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(130,255,145,0.3)]'
               }`}
             >
               {isSaving ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : saveSuccess ? (
                 <span className="flex items-center gap-2"><Check className="w-5 h-5" /> Guardado</span>
+              ) : (initialHomeScore !== null && initialAwayScore !== null) ? (
+                'Editar Pronóstico'
               ) : (
                 'Guardar Pronóstico'
               )}
