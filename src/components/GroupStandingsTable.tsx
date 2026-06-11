@@ -12,6 +12,7 @@ export interface GroupData {
     lost: number;
     goalDiff: number;
     points: number;
+    isPlayingLive?: boolean;
   }[];
 }
 
@@ -42,7 +43,10 @@ export const GroupStandingsTable: React.FC<GroupStandingsTableProps> = ({ group 
                 <img src={team.flag} alt={`${team.name} flag`} className="w-6 h-6 object-contain drop-shadow-sm rounded-sm" />
                 <span className="font-semibold text-foreground whitespace-nowrap overflow-hidden text-ellipsis max-w-[80px] md:max-w-[120px]" title={team.name}>{team.name}</span>
               </td>
-              <td className="px-2 py-3 text-center text-muted-foreground">{team.played}</td>
+              <td className="px-2 py-3 text-center text-muted-foreground">
+                {team.played}
+                {team.isPlayingLive && <span className="text-red-500 font-bold ml-0.5" title="Partido en vivo">*</span>}
+              </td>
               <td className="px-2 py-3 text-center text-muted-foreground">{team.won}</td>
               <td className="px-2 py-3 text-center text-muted-foreground">{team.drawn}</td>
               <td className="px-2 py-3 text-center text-muted-foreground">{team.lost}</td>
@@ -52,6 +56,11 @@ export const GroupStandingsTable: React.FC<GroupStandingsTableProps> = ({ group 
           ))}
         </tbody>
       </table>
+      {group.teams.some(t => t.isPlayingLive) && (
+        <div className="bg-muted/10 px-3 py-2 text-[10px] text-muted-foreground border-t border-border flex items-center gap-1">
+          <span className="text-red-500 font-bold">*</span> Partido en vivo (puntaje parcial)
+        </div>
+      )}
     </div>
   );
 };

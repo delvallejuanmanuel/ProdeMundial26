@@ -13,6 +13,18 @@ export const StandingsBoard = async () => {
     .order('goal_diff', { ascending: false })
     .order('goals_for', { ascending: false });
 
+  // Fetch live matches to mark teams currently playing
+  const { data: liveMatches } = await supabase
+    .from('matches')
+    .select('home_team_id, away_team_id')
+    .eq('status', 'in_play');
+
+  const liveTeamIds = new Set<number>();
+  liveMatches?.forEach(m => {
+    liveTeamIds.add(m.home_team_id);
+    liveTeamIds.add(m.away_team_id);
+  });
+
   if (error) {
     console.error('Error fetching standings:', error);
     return <div className="p-4 text-center text-muted-foreground border border-dashed border-border/50 rounded-xl">Error cargando posiciones.</div>;
@@ -38,7 +50,8 @@ export const StandingsBoard = async () => {
       drawn: row.drawn,
       lost: row.lost,
       goalDiff: row.goal_diff,
-      points: row.points
+      points: row.points,
+      isPlayingLive: liveTeamIds.has(row.team_id)
     });
   });
 
