@@ -39,7 +39,10 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
                   <Link href="/" className="hover:text-primary transition-colors text-foreground">Fixture</Link>
                   <Link href="/leaderboard" className="hover:text-primary transition-colors">Posiciones</Link>
                   <Link href="/especiales" className="hover:text-primary transition-colors">Especiales</Link>
-                  <Link href="/mi-simulacion" className="hover:text-primary transition-colors">Mi Simulación</Link>
+                  <Link href="/mi-simulacion" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                    Mi Simulación
+                    <span className="bg-primary/20 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">NUEVO</span>
+                  </Link>
                   <Link href="/estadisticas" className="hover:text-primary transition-colors">Estadísticas</Link>
                   <Link href="/reglas" className="hover:text-primary transition-colors">Reglas</Link>
                   {isAdmin && (
@@ -97,7 +100,10 @@ export function Header({ isAdmin = false, isLoggedIn = true }: HeaderProps) {
                 <Link href="/" className="text-lg font-medium" onClick={toggleMobileMenu}>Fixture</Link>
                 <Link href="/leaderboard" className="text-lg font-medium" onClick={toggleMobileMenu}>Posiciones</Link>
                 <Link href="/especiales" className="text-lg font-medium" onClick={toggleMobileMenu}>Especiales</Link>
-                <Link href="/mi-simulacion" className="text-lg font-medium" onClick={toggleMobileMenu}>Mi Simulación</Link>
+                <Link href="/mi-simulacion" className="text-lg font-medium flex items-center gap-2" onClick={toggleMobileMenu}>
+                  Mi Simulación
+                  <span className="bg-primary/20 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">NUEVO</span>
+                </Link>
                 <Link href="/estadisticas" className="text-lg font-medium" onClick={toggleMobileMenu}>Estadísticas</Link>
                 <Link href="/reglas" className="text-lg font-medium" onClick={toggleMobileMenu}>Reglas</Link>
                 <Link href="/perfil" className="text-lg font-medium flex items-center gap-2" onClick={toggleMobileMenu}>
