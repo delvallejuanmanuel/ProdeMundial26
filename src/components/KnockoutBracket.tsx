@@ -1,6 +1,5 @@
 import React from 'react';
 import { createClient } from '@/utils/supabase/server';
-import Image from 'next/image';
 
 interface Match {
   id: number;
@@ -71,7 +70,6 @@ function MatchNode({ match, side }: { match?: Match, side?: 'left' | 'right' }) 
   const homeDisplay = match.home_name || placeholder.home;
   const awayDisplay = match.away_name || placeholder.away;
   
-  // Convert UTC to ART visually (assuming kickoff_time is stored such that displaying it as UTC equals local time)
   const d = new Date(match.kickoff_time);
   const dateStr = d.toLocaleDateString('es-AR', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
   const timeStr = d.toLocaleTimeString('es-AR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' });
@@ -145,7 +143,6 @@ export async function KnockoutBracket() {
     return null;
   }
 
-  // Format matches array
   const matches: Match[] = (matchesData || []).map(m => ({
     id: m.id,
     phase: m.phase,
@@ -166,23 +163,14 @@ export async function KnockoutBracket() {
 
   const getMatch = (id: number) => matches.find(m => m.id === id);
 
-  // Grouped matches for a symmetrical layout:
-  // Left Side: 16avos (Top 8), Octavos (Top 4), Cuartos (Top 2), Semis (Top 1)
-  // Right Side: 16avos (Bottom 8), Octavos (Bottom 4), Cuartos (Bottom 2), Semis (Bottom 1)
-  
-  // From the official 2026 bracket flow, it's roughly structured into halves.
-  // Left side matches (usually IDs 73-80) and Right side (81-88) - this is an approximation for visual balance.
   const left16 = [73, 75, 74, 77, 76, 78, 79, 80];
   const right16 = [81, 82, 83, 84, 85, 87, 86, 88];
-
-  const left8 = [90, 89, 91, 92]; // Winners of left16
-  const right8 = [94, 93, 96, 95]; // Winners of right16
-
-  const left4 = [97, 99]; // Cuartos
-  const right4 = [98, 100]; // Cuartos
-
-  const left2 = [101]; // Semi 1
-  const right2 = [102]; // Semi 2
+  const left8 = [90, 89, 91, 92];
+  const right8 = [94, 93, 96, 95];
+  const left4 = [97, 99];
+  const right4 = [98, 100];
+  const left2 = [101];
+  const right2 = [102];
   
   const final = getMatch(104);
   const third = getMatch(103);
@@ -199,32 +187,25 @@ export async function KnockoutBracket() {
           
           {/* LEFT SIDE */}
           <div className="flex gap-4 items-center">
-            {/* 16avos Left */}
             <div className="flex flex-col gap-2">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">16avos</h3>
               {left16.map(id => <MatchNode key={id} match={getMatch(id)} side="left" />)}
             </div>
-            
-            {/* Octavos Left */}
             <div className="flex flex-col gap-6 justify-around h-full">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">Octavos</h3>
               {left8.map(id => <MatchNode key={id} match={getMatch(id)} side="left" />)}
             </div>
-
-            {/* Cuartos Left */}
             <div className="flex flex-col gap-[72px] justify-around h-full">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">Cuartos</h3>
               {left4.map(id => <MatchNode key={id} match={getMatch(id)} side="left" />)}
             </div>
-
-            {/* Semi Left */}
             <div className="flex flex-col justify-around h-full">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">Semifinal</h3>
               {left2.map(id => <MatchNode key={id} match={getMatch(id)} side="left" />)}
             </div>
           </div>
 
-          {/* CENTER - FINAL & 3RD PLACE */}
+          {/* CENTER */}
           <div className="flex flex-col gap-12 items-center justify-center px-4">
             <div className="flex flex-col items-center">
               <h3 className="text-center font-bold text-base text-primary uppercase mb-3">La Gran Final</h3>
@@ -238,25 +219,18 @@ export async function KnockoutBracket() {
 
           {/* RIGHT SIDE */}
           <div className="flex gap-4 items-center flex-row-reverse">
-            {/* 16avos Right */}
             <div className="flex flex-col gap-2">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">16avos</h3>
               {right16.map(id => <MatchNode key={id} match={getMatch(id)} side="right" />)}
             </div>
-            
-            {/* Octavos Right */}
             <div className="flex flex-col gap-6 justify-around h-full">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">Octavos</h3>
               {right8.map(id => <MatchNode key={id} match={getMatch(id)} side="right" />)}
             </div>
-
-            {/* Cuartos Right */}
             <div className="flex flex-col gap-[72px] justify-around h-full">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">Cuartos</h3>
               {right4.map(id => <MatchNode key={id} match={getMatch(id)} side="right" />)}
             </div>
-
-            {/* Semi Right */}
             <div className="flex flex-col justify-around h-full">
               <h3 className="text-center font-bold text-xs text-muted-foreground uppercase mb-2">Semifinal</h3>
               {right2.map(id => <MatchNode key={id} match={getMatch(id)} side="right" />)}
@@ -266,20 +240,10 @@ export async function KnockoutBracket() {
         </div>
       </div>
       <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar::-webkit-scrollbar {
-          height: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
       `}} />
     </div>
   );
