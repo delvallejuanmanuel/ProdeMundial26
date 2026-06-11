@@ -80,8 +80,8 @@ export async function GET(request: Request) {
 
         const updateData: any = {
           status: mappedStatus,
-          home_score: game.winner !== -1 ? game.teams[0].goals : null,
-          away_score: game.winner !== -1 ? game.teams[1].goals : null,
+          home_score: game.scores && game.scores.length >= 2 ? game.scores[0] : null,
+          away_score: game.scores && game.scores.length >= 2 ? game.scores[1] : null,
           promiedos_id: game.id // Keep promiedos_id synced
         };
 
