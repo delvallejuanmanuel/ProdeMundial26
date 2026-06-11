@@ -52,7 +52,9 @@ export default async function SpecialPredictionsPage() {
     .limit(1)
     .single();
 
-  const tournamentStart = matchData?.kickoff_time ? new Date(matchData.kickoff_time) : null;
+  const tournamentStart = matchData?.kickoff_time 
+    ? new Date(new Date(matchData.kickoff_time).getTime() + 3 * 60 * 60 * 1000) 
+    : null;
   const isLocked = tournamentStart ? new Date() > tournamentStart : false;
 
   return (

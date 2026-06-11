@@ -55,7 +55,9 @@ export function MatchCard({
   winnerByPenaltiesTeamId = null
 }: MatchCardProps) {
   // Lock logic: 1 hour before kickoff
-  const isTimeLocked = kickoffTime ? new Date(kickoffTime).getTime() - new Date().getTime() <= 60 * 60 * 1000 : false;
+  // Compensar +3 horas porque la base de datos almacena la hora ART como si fuera UTC
+  const adjustedKickoffTime = kickoffTime ? new Date(new Date(kickoffTime).getTime() + 3 * 60 * 60 * 1000) : null;
+  const isTimeLocked = adjustedKickoffTime ? adjustedKickoffTime.getTime() - new Date().getTime() <= 60 * 60 * 1000 : false;
   const isLocked = status !== 'pending' || !hasPaid || isTimeLocked;
   
   const [homeScore, setHomeScore] = useState<number | string>(initialHomeScore ?? '');

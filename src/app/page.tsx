@@ -26,7 +26,8 @@ export default async function Home() {
   }
 
   // Calculate next 48 hours. If the tournament hasn't started yet, show the first 48 hours of the tournament.
-  let startDate = new Date();
+  let realTime = new Date();
+  let startDate = new Date(realTime.getTime() - 3 * 60 * 60 * 1000);
   const wcStartDate = new Date('2026-06-11T00:00:00Z');
   
   if (startDate < wcStartDate) {
@@ -111,7 +112,7 @@ export default async function Home() {
     .single();
 
   const hasSpecialPredictions = !!specialPrediction;
-  const isTournamentStarted = new Date() > wcStartDate;
+  const isTournamentStarted = new Date() > new Date(wcStartDate.getTime() + 3 * 60 * 60 * 1000);
   const showSpecialsReminder = !hasSpecialPredictions && !isTournamentStarted;
 
   return (
