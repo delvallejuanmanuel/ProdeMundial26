@@ -59,7 +59,8 @@ export default async function LeaderboardPage() {
                   const isFirst = index === 0;
                   const isSecond = index === 1;
                   const isThird = index === 2;
-                  const isIneligible = !user.paid_knockouts;
+                  const paidCount = (user.paid_groups ? 1 : 0) + (user.paid_knockouts ? 1 : 0);
+                  const isIneligible = paidCount < 2;
 
                   return (
                     <tr key={user.user_id} className={`border-b border-border/20 hover:bg-white/5 transition-colors ${isFirst ? 'bg-primary/5' : ''}`}>
@@ -73,8 +74,8 @@ export default async function LeaderboardPage() {
                         <UserPerformanceTooltip userId={user.user_id} userName={user.nickname || user.name}>
                           <span className="truncate max-w-[120px] sm:max-w-xs block">{user.nickname || user.name}</span>
                           {isIneligible && (
-                            <Badge variant="destructive" className="text-[10px] h-5 hidden md:flex items-center gap-1 shrink-0 ml-2">
-                              <AlertCircle className="w-3 h-3" /> Fuera de Premio
+                            <Badge variant={paidCount === 0 ? "destructive" : "secondary"} className="text-[10px] h-5 hidden md:flex items-center gap-1 shrink-0 ml-2">
+                              <AlertCircle className="w-3 h-3" /> Cuota {paidCount}/2
                             </Badge>
                           )}
                         </UserPerformanceTooltip>

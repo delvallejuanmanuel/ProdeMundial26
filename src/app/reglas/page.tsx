@@ -114,6 +114,23 @@ export default async function ReglasPage() {
           </CardContent>
         </Card>
 
+        {/* Premio Global Rule */}
+        <Card className="border-border/50 bg-background/50 backdrop-blur-sm border-l-4 border-l-primary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-primary">
+              💳 Requisito para el Pozo Acumulado (Premio Global)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-muted-foreground text-sm leading-relaxed">
+            <p>
+              Para tener derecho a participar y cobrar el Premio Global al finalizar el torneo, es requisito obligatorio haber abonado la inscripción unificada completa (ambos tramos). Quien cuente únicamente con la <strong className="text-primary">Cuota 1/2</strong> tendrá el sistema bloqueado y <strong className="text-foreground">no podrá cargar sus pronósticos para la fase de Eliminatorias (Playoffs)</strong>.
+            </p>
+            <p>
+              En caso de llegar al cierre del Mundial adeudando alguna de las cuotas, el participante quedará automáticamente <strong className="text-destructive">excluido de la repartición del pozo final</strong>, independientemente de la cantidad de puntos que haya sumado en la tabla de posiciones.
+            </p>
+          </CardContent>
+        </Card>
+
       </div>
       </div>
     </div>
