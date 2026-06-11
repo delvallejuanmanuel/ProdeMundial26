@@ -75,7 +75,7 @@ export async function GET(request: Request) {
 
         let mappedStatus = 'pending';
         if (game.status.name === 'Prog.') mappedStatus = 'pending';
-        else if (game.status.name === 'Fin' || game.status.name === 'Fin Pen.') mappedStatus = 'finished';
+        else if (game.status.name === 'Fin' || game.status.name === 'Fin Pen.' || game.status.name === 'Finalizado') mappedStatus = 'finished';
         else mappedStatus = 'in_play';
 
         const updateData: any = {
