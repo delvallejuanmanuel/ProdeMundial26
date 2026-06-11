@@ -105,23 +105,34 @@ export async function GET(request: Request) {
     }
 
     // 5. Update Players (Goleadores)
-    const playersTable = data.players_statistics?.tables?.find((t: any) => t.name === 'Goles');
+    // Promiedos might not show the "Goles" table immediately, so we aggregate from match events
+    const playerGoals: Record<string, number> = {};
     let playersCount = 0;
-    if (playersTable && playersTable.rows) {
-      for (const row of playersTable.rows) {
-        const playerObj = row.entity.object;
-        const goalsValue = row.values.find((v: any) => v.key === 'Goals')?.value;
-        const goals = parseInt(goalsValue) || 0;
-        
-        const promiedosId = playerObj.sname || playerObj.name;
+    
+    for (const filter of games) {
+      if (!filter.games) continue;
+      for (const game of filter.games) {
+        if (!game.teams) continue;
+        for (const team of game.teams) {
+          if (team.goals && Array.isArray(team.goals)) {
+            for (const goal of team.goals) {
+               const pName = goal.player_sname || goal.player_name;
+               if (!pName) continue;
+               if (!playerGoals[pName]) playerGoals[pName] = 0;
+               playerGoals[pName]++;
+            }
+          }
+        }
+      }
+    }
 
+    for (const [promiedosId, goals] of Object.entries(playerGoals)) {
         await supabase
           .from('players')
           .update({ goals })
           .eq('promiedos_id', promiedosId);
           
         playersCount++;
-      }
     }
 
     // 6. Trigger points calculation for all finished matches
