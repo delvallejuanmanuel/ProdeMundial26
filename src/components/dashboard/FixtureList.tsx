@@ -33,6 +33,7 @@ interface FixtureListProps {
   userId: string;
   hasPaidGroups: boolean;
   hasPaidKnockouts: boolean;
+  readOnly?: boolean;
 }
 
 export function FixtureList({
@@ -40,7 +41,8 @@ export function FixtureList({
   predictions,
   userId,
   hasPaidGroups,
-  hasPaidKnockouts
+  hasPaidKnockouts,
+  readOnly = false
 }: FixtureListProps) {
   const [filter, setFilter] = useState<'all' | 'groups' | 'knockouts' | string>('all');
 
@@ -160,6 +162,7 @@ export function FixtureList({
                       initialAwayScore={userPrediction?.predicted_away_score}
                       initialPenaltiesWinner={userPrediction?.predicted_penalties_winner_team_id}
                       kickoffTime={match.kickoff_time}
+                      readOnly={readOnly}
                     />
                   );
                 })}

@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { Trophy, Medal, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-import { UserPerformanceTooltip } from '@/components/dashboard/UserPerformanceTooltip';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,16 +71,16 @@ export default async function LeaderboardPage() {
                          <span className="pl-1">{index + 1}</span>}
                       </td>
                       <td className="px-4 py-3 font-medium">
-                        <UserPerformanceTooltip userId={user.user_id} userName={user.nickname || user.name}>
+                        <Link href={`/jugador/${user.user_id}`} className="block hover:text-primary transition-colors" title={`Ver perfil de ${user.nickname || user.name}`}>
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1">
-                            <span className="truncate max-w-[120px] sm:max-w-xs block leading-tight">{user.nickname || user.name}</span>
+                            <span className="truncate max-w-[120px] sm:max-w-xs block leading-tight hover:underline">{user.nickname || user.name}</span>
                             {isIneligible && (
                               <Badge variant={paidCount === 0 ? "destructive" : "secondary"} className="text-[9px] h-4 px-1.5 flex items-center gap-1 w-max">
                                 <AlertCircle className="w-2.5 h-2.5" /> Cuota {paidCount}/2
                               </Badge>
                             )}
                           </div>
-                        </UserPerformanceTooltip>
+                        </Link>
                       </td>
                       <td className="px-3 py-3 text-center font-medium">
                         {user.matches_played ?? 0}

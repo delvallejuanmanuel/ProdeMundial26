@@ -29,6 +29,7 @@ interface MatchCardProps {
   awayTeamId?: number | null;
   initialPenaltiesWinner?: number | null;
   winnerByPenaltiesTeamId?: number | null;
+  readOnly?: boolean;
 }
 
 export function MatchCard({
@@ -52,13 +53,14 @@ export function MatchCard({
   homeTeamId = null,
   awayTeamId = null,
   initialPenaltiesWinner = null,
-  winnerByPenaltiesTeamId = null
+  winnerByPenaltiesTeamId = null,
+  readOnly = false
 }: MatchCardProps) {
   // Lock logic: 1 hour before kickoff
   // La base de datos ya almacena en UTC, no hace falta compensar.
   const adjustedKickoffTime = kickoffTime ? new Date(kickoffTime) : null;
   const isTimeLocked = adjustedKickoffTime ? adjustedKickoffTime.getTime() - new Date().getTime() <= 60 * 60 * 1000 : false;
-  const isLocked = status !== 'pending' || !hasPaid || isTimeLocked;
+  const isLocked = status !== 'pending' || !hasPaid || isTimeLocked || readOnly;
   
   const [homeScore, setHomeScore] = useState<number | string>(initialHomeScore ?? '');
   const [awayScore, setAwayScore] = useState<number | string>(initialAwayScore ?? '');
@@ -158,33 +160,39 @@ export function MatchCard({
 
           {/* Score / Inputs */}
           <div className="flex items-center justify-center space-x-3 w-1/3">
-            <input 
-              type="number" 
-              min="0" 
-              max="15"
-              disabled={isLocked || isSaving}
-              value={homeScore}
-              onChange={(e) => {
-                setHomeScore(e.target.value);
-                if (e.target.value !== awayScore) setPenaltiesWinner('');
-              }}
-              placeholder="-"
-              className="w-12 h-14 bg-background border border-border/50 rounded-lg text-center text-xl font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 transition-all disabled:cursor-not-allowed"
-            />
-            <span className="text-muted-foreground font-bold">:</span>
-            <input 
-              type="number" 
-              min="0" 
-              max="15"
-              disabled={isLocked || isSaving}
-              value={awayScore}
-              onChange={(e) => {
-                setAwayScore(e.target.value);
-                if (e.target.value !== homeScore) setPenaltiesWinner('');
-              }}
-              placeholder="-"
-              className="w-12 h-14 bg-background border border-border/50 rounded-lg text-center text-xl font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 transition-all disabled:cursor-not-allowed"
-            />
+            {!(readOnly && status === 'pending') ? (
+              <>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="15"
+                  disabled={isLocked || isSaving}
+                  value={homeScore}
+                  onChange={(e) => {
+                    setHomeScore(e.target.value);
+                    if (e.target.value !== awayScore) setPenaltiesWinner('');
+                  }}
+                  placeholder="-"
+                  className="w-12 h-14 bg-background border border-border/50 rounded-lg text-center text-xl font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 transition-all disabled:cursor-not-allowed"
+                />
+                <span className="text-muted-foreground font-bold">:</span>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="15"
+                  disabled={isLocked || isSaving}
+                  value={awayScore}
+                  onChange={(e) => {
+                    setAwayScore(e.target.value);
+                    if (e.target.value !== homeScore) setPenaltiesWinner('');
+                  }}
+                  placeholder="-"
+                  className="w-12 h-14 bg-background border border-border/50 rounded-lg text-center text-xl font-bold text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-50 transition-all disabled:cursor-not-allowed"
+                />
+              </>
+            ) : (
+              <span className="text-muted-foreground font-bold text-xl">- : -</span>
+            )}
           </div>
 
           {/* Away Team */}
@@ -249,7 +257,7 @@ export function MatchCard({
 
             {initialPenaltiesWinner && (
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-muted-foreground uppercase tracking-wider">Tu Elegido Penales</span>
+                <span className="font-semibold text-muted-foreground uppercase tracking-wider">Pronóstico Penales</span>
                 <span className={`font-bold ${Number(initialPenaltiesWinner) === Number(winnerByPenaltiesTeamId) ? 'text-green-500' : 'text-red-500'}`}>
                   {Number(initialPenaltiesWinner) === Number(homeTeamId) ? homeTeam : awayTeam}
                 </span>
@@ -258,7 +266,7 @@ export function MatchCard({
 
             {awardedPoints != null && (
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tu Pronóstico</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Puntos Obtenidos</span>
                 <span className={`text-sm font-bold px-2.5 py-0.5 rounded-full border ${pointsColor}`}>
                   +{awardedPoints} {awardedPoints === 1 ? 'punto' : 'puntos'}
                 </span>
@@ -267,7 +275,14 @@ export function MatchCard({
           </div>
         )}
 
-        {(!isLocked && hasPaid) ? (
+        {(readOnly && status === 'pending') && (
+          <div className="mt-4 pt-4 border-t border-border/20 flex flex-col items-center justify-center gap-1 opacity-70">
+            <span className="text-xl">🔒</span>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pronóstico Oculto</span>
+          </div>
+        )}
+
+        {(!isLocked && hasPaid && !readOnly) ? (
           <div className="mt-6">
             <Button 
               onClick={handleSave}
