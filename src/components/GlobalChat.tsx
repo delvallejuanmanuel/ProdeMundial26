@@ -139,7 +139,7 @@ export default function GlobalChat() {
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {isOpen && (
-        <div className="w-80 sm:w-96 h-[500px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl rounded-2xl flex flex-col mb-4 overflow-hidden animate-in slide-in-from-bottom-5">
+        <div className="fixed inset-0 sm:inset-auto sm:relative w-full h-[100dvh] sm:w-[380px] sm:h-[600px] bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 shadow-2xl sm:rounded-2xl flex flex-col sm:mb-4 overflow-hidden animate-in slide-in-from-bottom-5 z-[60]">
           {/* Header */}
           <div className="bg-blue-600 p-4 text-white flex justify-between items-center shrink-0">
             <h3 className="font-semibold text-lg flex items-center gap-2">

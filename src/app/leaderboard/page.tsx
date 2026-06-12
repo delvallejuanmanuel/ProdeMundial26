@@ -72,15 +72,20 @@ export default async function LeaderboardPage() {
                       </td>
                       <td className="px-4 py-3 font-medium">
                         <UserPerformanceTooltip userId={user.user_id} userName={user.nickname || user.name}>
-                          <span className="truncate max-w-[120px] sm:max-w-xs block">{user.nickname || user.name}</span>
-                          {isIneligible && (
-                            <Badge variant={paidCount === 0 ? "destructive" : "secondary"} className="text-[10px] h-5 hidden md:flex items-center gap-1 shrink-0 ml-2">
-                              <AlertCircle className="w-3 h-3" /> Cuota {paidCount}/2
-                            </Badge>
-                          )}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                            <span className="truncate max-w-[120px] sm:max-w-xs block leading-tight">{user.nickname || user.name}</span>
+                            {isIneligible && (
+                              <Badge variant={paidCount === 0 ? "destructive" : "secondary"} className="text-[9px] h-4 px-1.5 flex items-center gap-1 w-max">
+                                <AlertCircle className="w-2.5 h-2.5" /> Cuota {paidCount}/2
+                              </Badge>
+                            )}
+                          </div>
                         </UserPerformanceTooltip>
                       </td>
-                      <td className="px-3 py-3 text-center font-medium">{user.matches_played ?? 0}</td>
+                      <td className="px-3 py-3 text-center font-medium">
+                        {user.matches_played ?? 0}
+                        {(user.live_matches ?? 0) > 0 && <span className="text-red-500 font-bold ml-0.5" title="Partido en vivo">*</span>}
+                      </td>
                       <td className="px-3 py-3 text-center font-medium text-green-400">{user.exact_matches ?? 0}</td>
                       <td className="px-3 py-3 text-center font-medium text-blue-400">{user.diff_matches ?? 0}</td>
                       <td className="px-3 py-3 text-center font-medium text-yellow-400">{user.result_matches ?? 0}</td>
@@ -95,6 +100,11 @@ export default async function LeaderboardPage() {
               </tbody>
             </table>
           </div>
+          {users.some(u => (u.live_matches ?? 0) > 0) && (
+            <div className="bg-muted/10 px-4 py-3 text-xs text-muted-foreground border-t border-border flex items-center gap-1">
+              <span className="text-red-500 font-bold">*</span> Partido en vivo (puntaje parcial)
+            </div>
+          )}
         </div>
 
       </main>

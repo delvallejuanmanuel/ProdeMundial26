@@ -106,7 +106,7 @@ export async function GET(request: Request) {
 
     // 5. Update Players (Goleadores)
     // Promiedos might not show the "Goles" table immediately, so we aggregate from match events
-    const playerGoals: Record<string, number> = {};
+    const playerGoals: Record<string, { goals: number, teamName: string }> = {};
     let playersCount = 0;
     
     for (const filter of games) {
@@ -118,19 +118,39 @@ export async function GET(request: Request) {
             for (const goal of team.goals) {
                const pName = goal.player_sname || goal.player_name;
                if (!pName) continue;
-               if (!playerGoals[pName]) playerGoals[pName] = 0;
-               playerGoals[pName]++;
+               if (!playerGoals[pName]) playerGoals[pName] = { goals: 0, teamName: team.name };
+               playerGoals[pName].goals++;
             }
           }
         }
       }
     }
 
-    for (const [promiedosId, goals] of Object.entries(playerGoals)) {
-        await supabase
+    for (const [promiedosId, data] of Object.entries(playerGoals)) {
+        const { data: existingPlayers } = await supabase
           .from('players')
-          .update({ goals })
-          .eq('promiedos_id', promiedosId);
+          .select('id')
+          .eq('promiedos_id', promiedosId)
+          .limit(1);
+          
+        if (existingPlayers && existingPlayers.length > 0) {
+          await supabase
+            .from('players')
+            .update({ goals: data.goals })
+            .eq('id', existingPlayers[0].id);
+        } else {
+          const teamInDb = dbTeams?.find(t => t.name === data.teamName);
+          if (teamInDb) {
+            await supabase
+              .from('players')
+              .insert({
+                name: promiedosId,
+                promiedos_id: promiedosId,
+                team_id: teamInDb.id,
+                goals: data.goals
+              });
+          }
+        }
           
         playersCount++;
     }
