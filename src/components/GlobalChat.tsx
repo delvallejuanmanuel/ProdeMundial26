@@ -137,7 +137,7 @@ export default function GlobalChat() {
   if (isLoading || !user) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end">
       {isOpen && (
         <div className="fixed inset-0 sm:inset-auto sm:relative w-full h-[100dvh] sm:w-[380px] sm:h-[600px] bg-white dark:bg-slate-900 sm:border border-slate-200 dark:border-slate-800 shadow-2xl sm:rounded-2xl flex flex-col sm:mb-4 overflow-hidden animate-in slide-in-from-bottom-5 z-[60]">
           {/* Header */}
@@ -207,12 +207,12 @@ export default function GlobalChat() {
       {/* Floating Button */}
       <button
         onClick={toggleChat}
-        className="relative bg-blue-600 text-white p-4 rounded-full shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center"
+        className="relative bg-blue-600 text-white p-3 sm:p-4 rounded-full shadow-lg shadow-blue-600/30 hover:bg-blue-700 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center"
       >
-        {isOpen ? <X size={26} /> : <MessageCircle size={26} />}
+        {isOpen ? <X className="w-6 h-6 sm:w-[26px] sm:h-[26px]" /> : <MessageCircle className="w-6 h-6 sm:w-[26px] sm:h-[26px]" />}
         
         {!isOpen && unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-950 animate-in zoom-in">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-950 animate-in zoom-in">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
