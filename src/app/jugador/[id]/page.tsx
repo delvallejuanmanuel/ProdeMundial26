@@ -6,7 +6,8 @@ import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default async function PlayerProfilePage({ params }: { params: { id: string } }) {
+export default async function PlayerProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -18,7 +19,7 @@ export default async function PlayerProfilePage({ params }: { params: { id: stri
   const { data: playerProfile, error: profileError } = await supabase
     .from('profiles')
     .select('id, name, nickname')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (profileError || !playerProfile) {
@@ -29,7 +30,7 @@ export default async function PlayerProfilePage({ params }: { params: { id: stri
   const { data: playerStats } = await supabase
     .from('v_leaderboard')
     .select('*')
-    .eq('user_id', params.id)
+    .eq('user_id', id)
     .single();
 
   // Fetch ALL matches
@@ -54,7 +55,7 @@ export default async function PlayerProfilePage({ params }: { params: { id: stri
   const { data: userPredictions } = await supabase
     .from('predictions')
     .select('match_id, predicted_home_score, predicted_away_score, predicted_penalties_winner_team_id, awarded_points, matches!inner(status)')
-    .eq('user_id', params.id)
+    .eq('user_id', id)
     .neq('matches.status', 'pending');
     
   const predictions = userPredictions || [];
@@ -116,7 +117,7 @@ export default async function PlayerProfilePage({ params }: { params: { id: stri
         <FixtureList 
           matches={(matches as any) || []} 
           predictions={predictions} 
-          userId={params.id}
+          userId={id}
           hasPaidGroups={hasPaidGroups}
           hasPaidKnockouts={hasPaidKnockouts}
           readOnly={true}
