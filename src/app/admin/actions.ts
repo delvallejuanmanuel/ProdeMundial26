@@ -167,8 +167,23 @@ export async function sendReminderEmailAction(email: string, name: string) {
   try {
     await sendEmail({
       to: email,
-      subject: '¡Falta poco! Cargá tus pronósticos del Prode',
-      html: `<p>Hola ${name || 'Jugador'},</p><p>Te recordamos que aún tenés pronósticos pendientes por cargar. <strong>¡Tenés partidos muy próximos a cerrarse!</strong> Apurate antes de que empiecen y te quedes sin sumar puntos.</p><p>Ingresá ahora para completar tus predicciones.</p>`,
+      subject: '🏆 ¡Falta poco! Cargá tus pronósticos del Prode',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden;">
+          <div style="background: linear-gradient(90deg, #16a34a, #22c55e); padding: 25px 20px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 24px; text-transform: uppercase; font-weight: 900; letter-spacing: 1px;">🏆 PRODE MUNDIAL 26</h1>
+          </div>
+          <div style="padding: 30px 20px; text-align: center;">
+            <h2 style="color: #ffffff; font-size: 20px; margin-top: 0;">Hola ${name || 'Jugador'},</h2>
+            <p style="font-size: 16px; line-height: 1.6; color: #cbd5e1; margin-bottom: 25px;">Te recordamos que aún tenés pronósticos pendientes por cargar. <strong>¡Hay partidos muy próximos a cerrarse!</strong></p>
+            <p style="font-size: 16px; line-height: 1.6; color: #cbd5e1; margin-bottom: 30px;">Apurate antes de que empiecen y te quedes sin sumar puntos para el ranking.</p>
+            <a href="https://prodemundial26.com/fixture" style="display: inline-block; background-color: #22c55e; color: #ffffff; padding: 14px 28px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 50px; text-transform: uppercase;">Cargar Pronósticos ⚽</a>
+          </div>
+          <div style="background-color: #020617; padding: 15px; text-align: center; border-top: 1px solid #1e293b;">
+            <p style="font-size: 12px; color: #64748b; margin: 0;">No respondas a este correo. Nos vemos en la cancha.</p>
+          </div>
+        </div>
+      `,
     });
     return { success: true };
   } catch (err: any) {
