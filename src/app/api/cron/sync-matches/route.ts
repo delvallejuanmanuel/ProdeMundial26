@@ -118,6 +118,12 @@ export async function GET(request: Request) {
             for (const goal of team.goals) {
                const pName = goal.player_sname || goal.player_name;
                if (!pName) continue;
+               
+               // Ignorar goles en contra (Own Goals)
+               if (goal.goal_type && goal.goal_type.toUpperCase().includes('E.C')) {
+                 continue;
+               }
+
                if (!playerGoals[pName]) playerGoals[pName] = { goals: 0, teamName: team.name };
                playerGoals[pName].goals++;
             }
