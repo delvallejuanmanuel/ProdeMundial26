@@ -8,20 +8,28 @@ import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
-export default async function LeaderboardPage() {
+export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const supabase = await createClient();
+  const { matchday } = await searchParams;
+  const matchdayFilter = matchday ? parseInt(matchday as string, 10) : null;
   
-  const { data: leaderboard, error } = await supabase
-    .from('v_leaderboard')
-    .select('*')
-    .order('total_score', { ascending: false });
+  let leaderboardData;
+  if (matchdayFilter) {
+    const { data } = await supabase.rpc('get_leaderboard_by_matchday', { p_matchday: matchdayFilter });
+    leaderboardData = data;
+  } else {
+    const { data } = await supabase
+      .from('v_leaderboard')
+      .select('*')
+      .order('total_score', { ascending: false });
+    leaderboardData = data;
+  }
 
-  // For MVP, if no real users are found, we'll mock a few to show the UI
-  const users = leaderboard && leaderboard.length > 0 ? leaderboard : [
-    { user_id: '1', name: 'Leo Messi', nickname: 'La Pulga', total_score: 120, exact_matches: 15, special_points: 30, paid_groups: true, paid_knockouts: true },
-    { user_id: '2', name: 'Matias', nickname: null, total_score: 95, exact_matches: 8, special_points: 15, paid_groups: true, paid_knockouts: false },
-    { user_id: '3', name: 'Sofia', nickname: 'Sofi', total_score: 80, exact_matches: 6, special_points: 0, paid_groups: true, paid_knockouts: true },
-  ];
+  // Fetch winners to show stars
+  const { data: winnersData } = await supabase.from('matchday_winners').select('matchday, user_id');
+  const winners = winnersData || [];
+
+  const users: any[] = leaderboardData && leaderboardData.length > 0 ? leaderboardData : [];
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -34,6 +42,22 @@ export default async function LeaderboardPage() {
             <Trophy className="w-8 h-8 text-primary" /> Tabla de Posiciones
           </h1>
           <p className="text-muted-foreground">Ranking general del Prode Mundial 2026. Los premios se asignan según esta tabla.</p>
+        </div>
+
+        {/* Matchday Tabs */}
+        <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+          <Link href="/leaderboard" className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${!matchdayFilter ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            General
+          </Link>
+          <Link href="/leaderboard?matchday=1" className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${matchdayFilter === 1 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            Fecha 1
+          </Link>
+          <Link href="/leaderboard?matchday=2" className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${matchdayFilter === 2 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            Fecha 2
+          </Link>
+          <Link href="/leaderboard?matchday=3" className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${matchdayFilter === 3 ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}`}>
+            Fecha 3
+          </Link>
         </div>
 
         <div className="bg-card border border-border/50 rounded-2xl overflow-hidden shadow-2xl relative">
@@ -74,6 +98,9 @@ export default async function LeaderboardPage() {
                         <Link href={`/jugador/${user.user_id}`} className="block hover:text-primary transition-colors" title={`Ver perfil de ${user.nickname || user.name}`}>
                           <div className="flex flex-col sm:flex-row sm:items-center gap-1">
                             <span className="truncate max-w-[120px] sm:max-w-xs block leading-tight hover:underline">{user.nickname || user.name}</span>
+                            {winners.filter((w: any) => w.user_id === user.user_id).map((w: any) => (
+                              <span key={w.matchday} title={`Ganador Fecha ${w.matchday}`} className="text-xs">🌟</span>
+                            ))}
                             {isIneligible && (
                               <Badge variant={paidCount === 0 ? "destructive" : "secondary"} className="text-[9px] h-4 px-1.5 flex items-center gap-1 w-max">
                                 <AlertCircle className="w-2.5 h-2.5" /> Cuota {paidCount}/2
