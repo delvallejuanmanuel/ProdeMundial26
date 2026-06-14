@@ -5,8 +5,9 @@ import { UsersTable } from '@/components/admin/UsersTable';
 import { MatchesTable } from '@/components/admin/MatchesTable';
 import { SpecialResultsForm } from '@/components/admin/SpecialResultsForm';
 import { PlayersTable } from '@/components/admin/PlayersTable';
-import { ShieldAlert, Users, Trophy, Star, Target } from 'lucide-react';
+import { ShieldAlert, Users, Trophy, Star, Target, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<'users' | 'matches' | 'players' | 'specials'>('users');
@@ -51,6 +52,15 @@ export default function AdminDashboardPage() {
           >
             <Star className="w-4 h-4" /> Cierre
           </Button>
+          <div className="w-px bg-border/50 mx-1"></div>
+          <Link href="/admin/premios" passHref>
+            <Button 
+              variant="ghost" 
+              className="flex items-center gap-2 hover:bg-background/50 text-amber-500 hover:text-amber-600 font-bold"
+            >
+              <Gift className="w-4 h-4" /> Premios
+            </Button>
+          </Link>
         </div>
       </div>
 
