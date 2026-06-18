@@ -33,16 +33,54 @@ export async function GET(request: Request) {
 
     // 2. Fetch data from Promiedos
     const PROMIEDOS_URL = 'https://www.promiedos.com.ar/league/fifa-world-cup/fjda'; // 2022 World Cup URL for testing
-    const response = await fetch(PROMIEDOS_URL, { cache: 'no-store' });
-    const html = await response.text();
+    const HOME_URL = 'https://www.promiedos.com.ar/';
     
-    // Extract NEXT_DATA
+    const [response, homeResponse] = await Promise.all([
+      fetch(PROMIEDOS_URL, { cache: 'no-store' }),
+      fetch(HOME_URL, { cache: 'no-store' })
+    ]);
+    
+    const html = await response.text();
+    const homeHtml = await homeResponse.text();
+    
+    // Extract NEXT_DATA from tournament page
     const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/);
     if (!match) throw new Error('No NEXT_DATA found in Promiedos page');
-    
     const data = JSON.parse(match[1]).props.pageProps.data;
 
-    // 3. Fetch all Teams and Matches from DB
+    // Extract NEXT_DATA from homepage for live matches
+    const homeMatch = homeHtml.match(/<script id="__NEXT_DATA__" type="application\/json">(.*?)<\/script>/);
+    let liveGames: any[] = [];
+    if (homeMatch) {
+      const homeData = JSON.parse(homeMatch[1]).props.pageProps.data;
+      if (homeData.leagues) {
+        // Look for the Mundial league in the homepage
+        const mundial = homeData.leagues.find((l: any) => l.name.includes('Mundial') || l.url_name === 'fifa-world-cup' || l.id === 'fjda');
+        if (mundial && mundial.games) {
+          liveGames = mundial.games;
+        }
+      }
+    }
+
+    // 3. Combine all games into a single unique map (live games take precedence)
+    const uniqueGames = new Map();
+    const filters = data.games.filters;
+    for (const filter of filters) {
+      if (!filter.games) continue;
+      for (const game of filter.games) {
+        // Only set if not already present to avoid overwriting with duplicate Matchday 1 matches from Fecha 2
+        if (!uniqueGames.has(game.id)) {
+          uniqueGames.set(game.id, game);
+        }
+      }
+    }
+    
+    // Override with live games from homepage
+    for (const game of liveGames) {
+      uniqueGames.set(game.id, game);
+    }
+
+    // 4. Fetch all Teams and Matches from DB
     const { data: dbTeams, error: dbTeamsError } = await supabase.from('teams').select('*');
     if (dbTeamsError) throw dbTeamsError;
     const { data: dbMatches, error: dbMatchesError } = await supabase.from('matches').select('*');
@@ -59,13 +97,10 @@ export async function GET(request: Request) {
       }
     }
 
-    // 4. Update Matches
-    const games = data.games.filters;
+    // 5. Update Matches
     let matchesCount = 0;
     
-    for (const filter of games) {
-      if (!filter.games) continue;
-      for (const game of filter.games) {
+    for (const game of uniqueGames.values()) {
         if (!game.teams || game.teams.length < 2) continue;
         
         const homeTeamId = promiedosToDbTeam[game.teams[0].id];
@@ -101,22 +136,10 @@ export async function GET(request: Request) {
             
           matchesCount++;
         }
-      }
     }
 
-    // 5. Update Players (Goleadores) via match_player_goals
+    // 6. Update Players (Goleadores) via match_player_goals
     let playersCount = 0;
-    
-    // Deduplicate games by game.id
-    const uniqueGames = new Map();
-    for (const filter of games) {
-      if (!filter.games) continue;
-      for (const game of filter.games) {
-        if (!uniqueGames.has(game.id)) {
-          uniqueGames.set(game.id, game);
-        }
-      }
-    }
 
     // Process goals per specific match
     for (const [gameId, game] of uniqueGames.entries()) {
