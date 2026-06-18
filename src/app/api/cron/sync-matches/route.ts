@@ -104,35 +104,54 @@ export async function GET(request: Request) {
       }
     }
 
-    // 5. Update Players (Goleadores)
-    // Promiedos might not show the "Goles" table immediately, so we aggregate from match events
-    const playerGoals: Record<string, { goals: number, teamName: string }> = {};
+    // 5. Update Players (Goleadores) via match_player_goals
     let playersCount = 0;
     
+    // Deduplicate games by game.id
+    const uniqueGames = new Map();
     for (const filter of games) {
       if (!filter.games) continue;
       for (const game of filter.games) {
-        if (!game.teams) continue;
-        for (const team of game.teams) {
-          if (team.goals && Array.isArray(team.goals)) {
-            for (const goal of team.goals) {
-               const pName = goal.player_sname || goal.player_name;
-               if (!pName) continue;
-               
-               // Ignorar goles en contra (Own Goals)
-               if (goal.goal_type && goal.goal_type.toUpperCase().includes('E.C')) {
-                 continue;
-               }
-
-               if (!playerGoals[pName]) playerGoals[pName] = { goals: 0, teamName: team.name };
-               playerGoals[pName].goals++;
-            }
-          }
+        if (!uniqueGames.has(game.id)) {
+          uniqueGames.set(game.id, game);
         }
       }
     }
 
-    for (const [promiedosId, data] of Object.entries(playerGoals)) {
+    // Process goals per specific match
+    for (const [gameId, game] of uniqueGames.entries()) {
+      if (!game.teams || game.teams.length < 2) continue;
+      
+      const homeTeamId = promiedosToDbTeam[game.teams[0].id];
+      const awayTeamId = promiedosToDbTeam[game.teams[1].id];
+      
+      const matchInDb = dbMatches.find((m: any) => m.promiedos_id === gameId) || 
+          dbMatches.find((m: any) => 
+            !m.promiedos_id && 
+            ((m.home_team_id === homeTeamId && m.away_team_id === awayTeamId) ||
+             (m.home_team_id === awayTeamId && m.away_team_id === homeTeamId))
+          );
+          
+      if (!matchInDb) continue; 
+
+      const matchPlayerGoals: Record<string, { goals: number, teamName: string }> = {};
+
+      for (const team of game.teams) {
+        if (team.goals && Array.isArray(team.goals)) {
+          for (const goal of team.goals) {
+             const pName = goal.player_sname || goal.player_name;
+             if (!pName) continue;
+             if (goal.goal_type && goal.goal_type.toUpperCase().includes('E.C')) continue;
+             
+             if (!matchPlayerGoals[pName]) matchPlayerGoals[pName] = { goals: 0, teamName: team.name };
+             matchPlayerGoals[pName].goals++;
+          }
+        }
+      }
+
+      for (const [promiedosId, data] of Object.entries(matchPlayerGoals)) {
+        let playerId = null;
+        
         const { data: existingPlayers } = await supabase
           .from('players')
           .select('id')
@@ -140,26 +159,40 @@ export async function GET(request: Request) {
           .limit(1);
           
         if (existingPlayers && existingPlayers.length > 0) {
-          await supabase
-            .from('players')
-            .update({ goals: data.goals })
-            .eq('id', existingPlayers[0].id);
+          playerId = existingPlayers[0].id;
         } else {
           const teamInDb = dbTeams?.find(t => t.name === data.teamName);
           if (teamInDb) {
-            await supabase
+            const { data: newPlayer } = await supabase
               .from('players')
               .insert({
                 name: promiedosId,
                 promiedos_id: promiedosId,
                 team_id: teamInDb.id,
-                goals: data.goals
-              });
+                goals: 0
+              })
+              .select('id')
+              .single();
+            if (newPlayer) playerId = newPlayer.id;
           }
         }
-          
-        playersCount++;
+
+        if (playerId) {
+          await supabase
+            .from('match_player_goals')
+            .upsert({
+              match_id: matchInDb.id,
+              player_id: playerId,
+              goals_count: data.goals
+            }, { onConflict: 'match_id, player_id' });
+            
+          playersCount++;
+        }
+      }
     }
+
+    // Recalcular goles totales de forma auto-controlada
+    await supabase.rpc('recalculate_player_goals');
 
     // 6. Trigger points calculation for all finished matches
     const { error: rpcError } = await supabase.rpc('calculate_points');
