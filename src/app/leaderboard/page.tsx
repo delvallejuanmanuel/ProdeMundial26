@@ -83,7 +83,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                   const isFirst = index === 0;
                   const isSecond = index === 1;
                   const isThird = index === 2;
-                  const paidCount = (user.paid_groups ? 1 : 0) + (user.paid_knockouts ? 1 : 0);
+                  const paidCount = (user.paid_groups ? 1 : 0) + ((user.paid_knockouts || user.paid_global_only) ? 1 : 0);
                   const isIneligible = paidCount < 2;
 
                   return (
