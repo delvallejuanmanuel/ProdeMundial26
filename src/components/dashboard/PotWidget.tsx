@@ -85,13 +85,7 @@ export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0, totalGl
                 <span className="flex items-center gap-1">
                   <Users className="w-3 h-3" /> Pagos Eliminatorias
                 </span>
-                <span className="text-foreground">{totalKnockoutsPaid}</span>
-              </div>
-              <div className="flex justify-between text-xs font-medium text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Users className="w-3 h-3" /> Pagos Tardíos (Global)
-                </span>
-                <span className="text-foreground">{totalGlobalOnlyPaid}</span>
+                <span className="text-foreground">{totalKnockoutsPaid + (totalGlobalOnlyPaid || 0)}</span>
               </div>
             </div>
           </div>
