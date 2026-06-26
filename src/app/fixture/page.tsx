@@ -35,12 +35,12 @@ export default async function FixturePage() {
   // Fetch user profile to check payment status
   const { data: profile } = await supabase
     .from('profiles')
-    .select('paid_groups, paid_knockouts, is_admin')
+    .select('paid_groups, paid_knockouts, paid_global_only, is_admin')
     .eq('id', user.id)
     .single();
 
   const hasPaidGroups = profile?.paid_groups ?? false;
-  const hasPaidKnockouts = profile?.paid_knockouts ?? false;
+  const hasPaidKnockouts = profile?.paid_knockouts || profile?.paid_global_only || false;
   const isAdmin = profile?.is_admin ?? false;
 
   // Fetch user predictions
