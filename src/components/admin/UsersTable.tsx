@@ -71,7 +71,7 @@ export function UsersTable() {
     fetchUsers();
   }, []);
 
-  const togglePayment = async (userId: string, field: 'paid_groups' | 'paid_knockouts', currentValue: boolean) => {
+  const togglePayment = async (userId: string, field: 'paid_groups' | 'paid_knockouts' | 'paid_global_only', currentValue: boolean) => {
     const updateData: any = { [field]: !currentValue };
     // If we are setting it to paid, clear the notification flag
     if (!currentValue) {
@@ -129,6 +129,7 @@ export function UsersTable() {
               <th className="px-4 py-3 text-center">Pronósticos</th>
               <th className="px-4 py-3 text-center">Fase Grupos</th>
               <th className="px-4 py-3 text-center">Fase Eliminatoria</th>
+              <th className="px-4 py-3 text-center">Tardío (Global)</th>
               <th className="px-4 py-3 text-center">Chat</th>
             </tr>
           </thead>
@@ -192,6 +193,16 @@ export function UsersTable() {
                 <td className="px-4 py-3 text-center">
                   <Button 
                     size="sm" 
+                    variant={user.paid_global_only ? 'default' : 'outline'}
+                    onClick={() => togglePayment(user.id, 'paid_global_only', user.paid_global_only)}
+                    className={user.paid_global_only ? 'bg-purple-500 hover:bg-purple-600 text-white' : ''}
+                  >
+                    {user.paid_global_only ? 'Pagado' : 'Pendiente'}
+                  </Button>
+                </td>
+                <td className="px-4 py-3 text-center">
+                  <Button 
+                    size="sm" 
                     variant={user.chat_blocked ? 'destructive' : 'outline'}
                     onClick={() => handleToggleChatBlock(user.id, user.chat_blocked || false)}
                     title={user.chat_blocked ? 'Chat bloqueado. Clic para habilitar.' : 'Chat habilitado. Clic para bloquear.'}
@@ -204,7 +215,7 @@ export function UsersTable() {
             ))}
             {users.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted-foreground">
                   No hay usuarios registrados.
                 </td>
               </tr>

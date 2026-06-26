@@ -5,19 +5,22 @@ import { Trophy, Users, DollarSign } from 'lucide-react';
 interface PotWidgetProps {
   totalGroupsPaid?: number;
   totalKnockoutsPaid?: number;
+  totalGlobalOnlyPaid?: number;
 }
 
-export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0 }: PotWidgetProps) {
+export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0, totalGlobalOnlyPaid = 0 }: PotWidgetProps) {
   const PHASE_PRICE = 20000;
   
   const groupsPot = totalGroupsPaid * PHASE_PRICE;
   const knockoutsPot = totalKnockoutsPaid * PHASE_PRICE;
-  const totalPot = groupsPot + knockoutsPot;
+  const latePot = totalGlobalOnlyPaid * PHASE_PRICE;
+  
+  const originalPot = groupsPot + knockoutsPot;
   
   const currentPhase = "Fase de Grupos";
-  const phasePrize = totalPot * 0.30; // 30% of total goes to Group Phase winner
-  const globalPrize = totalPot * 0.70; // 70% of total goes to Global winner
-  const totalPaid = Math.max(totalGroupsPaid, totalKnockoutsPaid); // Approximation of unique users
+  const phasePrize = originalPot * 0.30; // 30% of original pot goes to Group Phase winner
+  const globalPrize = (originalPot * 0.70) + latePot; // 70% of original + 100% of late goes to Global winner
+  const totalPaid = Math.max(totalGroupsPaid, totalKnockoutsPaid) + totalGlobalOnlyPaid; // Approximation of unique users
 
   return (
     <Card className="w-full bg-gradient-to-br from-card to-card/50 border-border/50 shadow-2xl relative overflow-hidden h-full">
@@ -36,7 +39,7 @@ export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0 }: PotWi
             </h2>
             <div className="text-4xl font-extrabold text-foreground tracking-tight flex items-center justify-center gap-1">
               <span className="text-primary text-2xl">$</span>
-              {totalPot.toLocaleString('es-AR')}
+              {(originalPot + latePot).toLocaleString('es-AR')}
             </div>
             <p className="text-xs text-muted-foreground">
               Basado en {totalPaid} pagos confirmados.
@@ -83,6 +86,12 @@ export function PotWidget({ totalGroupsPaid = 0, totalKnockoutsPaid = 0 }: PotWi
                   <Users className="w-3 h-3" /> Pagos Eliminatorias
                 </span>
                 <span className="text-foreground">{totalKnockoutsPaid}</span>
+              </div>
+              <div className="flex justify-between text-xs font-medium text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Users className="w-3 h-3" /> Pagos Tardíos (Global)
+                </span>
+                <span className="text-foreground">{totalGlobalOnlyPaid}</span>
               </div>
             </div>
           </div>

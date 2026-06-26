@@ -105,8 +105,14 @@ export default async function Home() {
     .select('id', { count: 'exact', head: true })
     .eq('paid_knockouts', true);
 
+  const { count: paidGlobalOnlyCount } = await supabase
+    .from('profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('paid_global_only', true);
+
   const totalGroupsPaid = paidGroupsCount || 0;
   const totalKnockoutsPaid = paidKnockoutsCount || 0;
+  const totalGlobalOnlyPaid = paidGlobalOnlyCount || 0;
 
   // Fetch leaderboard to calculate rank and get stats
   const { data: leaderboard } = await supabase
@@ -190,7 +196,11 @@ export default async function Home() {
 
           {/* Pot Widget Section */}
           <section className="lg:w-1/3 shrink-0">
-            <PotWidget totalGroupsPaid={totalGroupsPaid} totalKnockoutsPaid={totalKnockoutsPaid} />
+            <PotWidget 
+              totalGroupsPaid={totalGroupsPaid} 
+              totalKnockoutsPaid={totalKnockoutsPaid} 
+              totalGlobalOnlyPaid={totalGlobalOnlyPaid}
+            />
           </section>
         </div>
 
