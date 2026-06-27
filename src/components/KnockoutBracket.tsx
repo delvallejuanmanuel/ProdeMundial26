@@ -163,10 +163,10 @@ export async function KnockoutBracket() {
 
   const getMatch = (id: number) => matches.find(m => m.id === id);
 
-  const left16 = [73, 75, 74, 77, 76, 78, 79, 80];
-  const right16 = [81, 82, 83, 84, 85, 87, 86, 88];
-  const left8 = [90, 89, 91, 92];
-  const right8 = [94, 93, 96, 95];
+  const left16 = [74, 77, 73, 75, 76, 78, 79, 80];
+  const right16 = [83, 84, 81, 82, 86, 88, 85, 87];
+  const left8 = [89, 90, 91, 92];
+  const right8 = [93, 94, 95, 96];
   const left4 = [97, 99];
   const right4 = [98, 100];
   const left2 = [101];
