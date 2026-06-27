@@ -75,6 +75,21 @@ export async function GET(request: Request) {
       }
     }
     
+    // Add playoffs from brackets
+    if (data.brackets && data.brackets.stages) {
+      for (const stage of data.brackets.stages) {
+        if (!stage.groups) continue;
+        for (const group of stage.groups) {
+          if (!group.games) continue;
+          for (const game of group.games) {
+            if (game.id && !uniqueGames.has(game.id)) {
+               uniqueGames.set(game.id, game);
+            }
+          }
+        }
+      }
+    }
+    
     // Override with live games from homepage
     for (const game of liveGames) {
       uniqueGames.set(game.id, game);
@@ -103,10 +118,9 @@ export async function GET(request: Request) {
     for (const game of uniqueGames.values()) {
         if (!game.teams || game.teams.length < 2) continue;
         
-        const homeTeamId = promiedosToDbTeam[game.teams[0].id];
-        const awayTeamId = promiedosToDbTeam[game.teams[1].id];
+        const homeTeamId = game.teams[0].id ? promiedosToDbTeam[game.teams[0].id] : undefined;
+        const awayTeamId = game.teams[1].id ? promiedosToDbTeam[game.teams[1].id] : undefined;
         
-        if (!homeTeamId || !awayTeamId) continue;
 
         let mappedStatus = 'pending';
         if (game.status.name === 'Prog.') mappedStatus = 'pending';
@@ -119,16 +133,48 @@ export async function GET(request: Request) {
           away_score: game.scores && game.scores.length >= 2 ? game.scores[1] : null,
           promiedos_id: game.id // Keep promiedos_id synced
         };
+        
+        if (homeTeamId) updateData.home_team_id = homeTeamId;
+        if (awayTeamId) updateData.away_team_id = awayTeamId;
 
-        // Find match by exact promiedos_id OR by order-agnostic teams (first unlinked match)
-        const matchInDb = dbMatches.find((m: any) => m.promiedos_id === game.id) || 
-          dbMatches.find((m: any) => 
-            !m.promiedos_id && // Only link if not already linked
-            ((m.home_team_id === homeTeamId && m.away_team_id === awayTeamId) ||
-             (m.home_team_id === awayTeamId && m.away_team_id === homeTeamId))
-          );
+        // Find match by exact promiedos_id OR by order-agnostic teams OR by exact playoff kickoff_time
+        let matchInDb = dbMatches.find((m: any) => m.promiedos_id === game.id);
+        
+        if (!matchInDb && homeTeamId && awayTeamId) {
+            matchInDb = dbMatches.find((m: any) => 
+                !m.promiedos_id && // Only link if not already linked
+                ((m.home_team_id === homeTeamId && m.away_team_id === awayTeamId) ||
+                 (m.home_team_id === awayTeamId && m.away_team_id === homeTeamId))
+            );
+        }
+        
+        // Playoff matching by exact time if no promiedos_id and home/away match fails
+        if (!matchInDb && game.start_time) {
+            // game.start_time format: "29-06-2026 17:30" (Argentina time UTC-3)
+            const parts = game.start_time.split(/[- :]/);
+            if (parts.length === 5) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                const year = parseInt(parts[2], 10);
+                const hour = parseInt(parts[3], 10);
+                const minute = parseInt(parts[4], 10);
+                
+                // Create Date in UTC matching the Argentina time + 3 hours
+                const promiedosUtcTime = new Date(Date.UTC(year, month, day, hour + 3, minute));
+                
+                matchInDb = dbMatches.find((m: any) => {
+                    if (m.promiedos_id || m.phase.toLowerCase().startsWith('grupo')) return false;
+                    const dbTime = new Date(m.kickoff_time);
+                    return dbTime.getTime() === promiedosUtcTime.getTime();
+                });
+            }
+        }
 
         if (matchInDb) {
+          matchInDb.promiedos_id = game.id;
+          if (homeTeamId) matchInDb.home_team_id = homeTeamId;
+          if (awayTeamId) matchInDb.away_team_id = awayTeamId;
+
           await supabase
             .from('matches')
             .update(updateData)
@@ -145,8 +191,8 @@ export async function GET(request: Request) {
     for (const [gameId, game] of uniqueGames.entries()) {
       if (!game.teams || game.teams.length < 2) continue;
       
-      const homeTeamId = promiedosToDbTeam[game.teams[0].id];
-      const awayTeamId = promiedosToDbTeam[game.teams[1].id];
+      const homeTeamId = game.teams[0].id ? promiedosToDbTeam[game.teams[0].id] : undefined;
+      const awayTeamId = game.teams[1].id ? promiedosToDbTeam[game.teams[1].id] : undefined;
       
       const matchInDb = dbMatches.find((m: any) => m.promiedos_id === gameId) || 
           dbMatches.find((m: any) => 
