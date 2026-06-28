@@ -208,7 +208,7 @@ export function MatchCard({
         {isPlayoff && isTie && (
           <div className="mt-4 pt-4 border-t border-border/20 space-y-2 animate-in slide-in-from-top-2 duration-200">
             <p className="text-xs font-bold text-center text-muted-foreground uppercase tracking-wider">
-              ¿Quién avanza? (Penales o suplementario)
+              ¿Quién avanza? (Definición por Penales)
             </p>
             <div className="flex gap-4 justify-center">
               <button
