@@ -43,10 +43,11 @@ export function UsersTable() {
     try {
       const { getAdminUsersAction } = await import('@/app/admin/actions');
       const profiles = await getAdminUsersAction();
-      // 3. Calcular faltantes
       const processedUsers = (profiles || []).map((user: any) => {
         const userPreds = user.predictions || [];
-        const totalPreds = userPreds.length;
+        // Only count predictions for playoff matches (ID >= 73)
+        const playoffPreds = userPreds.filter((p: any) => p.match_id >= 73);
+        const totalPlayoffPreds = playoffPreds.length;
         
         let missingUrgent = 0;
         if (urgentMatchIds.length > 0) {
@@ -56,7 +57,7 @@ export function UsersTable() {
 
         return {
           ...user,
-          total_predictions: totalPreds,
+          total_predictions: totalPlayoffPreds,
           missing_urgent: missingUrgent
         };
       });
@@ -146,7 +147,7 @@ export function UsersTable() {
                 <td className="px-4 py-3 text-muted-foreground">{user.email}</td>
                 <td className="px-4 py-3 text-center">
                   <div className="flex flex-col items-center gap-1">
-                    <span className="text-xs font-bold">{user.total_predictions || 0} / 72</span>
+                    <span className="text-xs font-bold">{user.total_predictions || 0} / 32</span>
                     {user.missing_urgent > 0 && (
                       <div className="flex items-center gap-1 mt-1">
                         <span className="text-[10px] font-bold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">

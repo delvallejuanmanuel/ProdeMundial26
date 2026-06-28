@@ -28,7 +28,7 @@ export default async function ProfilePage() {
 
   const isAdmin = profile?.is_admin || false;
   const hasPaidGroups = profile?.paid_groups || false;
-  const hasPaidKnockouts = profile?.paid_knockouts || false;
+  const hasPaidKnockouts = profile?.paid_knockouts || profile?.paid_global_only || false;
 
   // Fetch leaderboard to calculate rank and get stats
   const { data: leaderboard } = await supabase
