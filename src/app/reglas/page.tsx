@@ -70,8 +70,15 @@ export default async function ReglasPage() {
                 <span><strong>Acierto de Tendencia:</strong> Acertaste al equipo ganador, pero no la diferencia de goles (ej: Predijiste 1-0 y salió 3-0).</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs mt-0.5">+5 pts</span>
-                <span><strong>Pleno en Penales (Playoffs):</strong> En partidos de eliminatoria, si predices un empate y además aciertas quién avanza en la tanda de penales, obtienes un **Acierto Pleno (5 puntos)** directos. Si erras el ganador de la tanda, sumas 0 puntos.</span>
+                <span className="bg-purple-500/20 text-purple-500 font-bold px-2 py-0.5 rounded text-xs mt-0.5">5,3,1 pts</span>
+                <span><strong>Desempate por Penales (Playoffs):</strong> Si predecís un empate en los 120 minutos, los puntos se dividen de la siguiente manera:
+                  <ul className="list-disc list-inside ml-2 mt-1 space-y-0.5">
+                    <li><strong className="text-foreground">+5 pts:</strong> Acertás resultado exacto del empate y el ganador de los penales.</li>
+                    <li><strong className="text-foreground">+3 pts:</strong> Acertás que era un empate pero errás los goles (ej. pusiste 2-2 y salió 1-1), pero acertás el ganador de penales.</li>
+                    <li><strong className="text-foreground">+1 pt:</strong> Acertás que había empate, pero errás quién pasa por penales (premio consuelo por adivinar un partido tan parejo).</li>
+                    <li><strong className="text-foreground">0 pts:</strong> Predecís un empate y en la realidad el partido se define en 90/120 min sin llegar a penales.</li>
+                  </ul>
+                </span>
               </li>
             </ul>
 
