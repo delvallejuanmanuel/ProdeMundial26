@@ -2,9 +2,8 @@ import React from 'react';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
-import { SimulatedGroupTable } from '@/components/simulation/SimulatedGroupTable';
 import { SimulatedBracket } from '@/components/simulation/SimulatedBracket';
-import { computeSimulation, type SimulatedTeam } from '@/utils/simulation';
+import { computePlayoffSimulation } from '@/utils/simulation';
 import Link from 'next/link';
 import { ArrowLeft, FlaskConical, AlertTriangle } from 'lucide-react';
 
@@ -26,8 +25,8 @@ export default async function MiSimulacionPage() {
 
   const isAdmin = profile?.is_admin ?? false;
 
-  // Fetch all group stage matches with team info
-  const { data: groupMatches } = await supabase
+  // Fetch all playoff matches (exclude group stage)
+  const { data: playoffMatches } = await supabase
     .from('matches')
     .select(`
       id,
@@ -37,26 +36,27 @@ export default async function MiSimulacionPage() {
       away_score,
       home_team_id,
       away_team_id,
+      winner_by_penalties_team_id,
       home_team:teams!home_team_id(id, name, flag),
       away_team:teams!away_team_id(id, name, flag)
     `)
-    .like('phase', 'Grupo%')
-    .order('phase', { ascending: true });
+    .not('phase', 'like', 'Grupo%')
+    .order('kickoff_time', { ascending: true });
 
-  // Fetch user's predictions for group stage matches
-  const groupMatchIds = (groupMatches ?? []).map(m => m.id);
+  // Fetch user's predictions for playoff matches
+  const playoffMatchIds = (playoffMatches ?? []).map(m => m.id);
   const { data: userPredictions } = await supabase
     .from('predictions')
-    .select('match_id, predicted_home_score, predicted_away_score')
+    .select('match_id, predicted_home_score, predicted_away_score, predicted_penalties_winner_team_id')
     .eq('user_id', user.id)
-    .in('match_id', groupMatchIds.length > 0 ? groupMatchIds : [-1]);
+    .in('match_id', playoffMatchIds.length > 0 ? playoffMatchIds : [-1]);
 
-  const { groups, qualifierMap, thirdsRanked } = computeSimulation(
-    groupMatches ?? [],
+  const { qualifierMap } = computePlayoffSimulation(
+    playoffMatches ?? [],
     userPredictions ?? []
   );
 
-  const totalGroupMatches = groupMatchIds.length;
+  const totalPlayoffMatches = playoffMatchIds.length;
   const predictedMatchCount = (userPredictions ?? []).filter(
     p => p.predicted_home_score !== null && p.predicted_away_score !== null
   ).length;
@@ -79,9 +79,9 @@ export default async function MiSimulacionPage() {
               <FlaskConical className="w-6 h-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight">Mi Simulación</h1>
+              <h1 className="text-3xl font-black tracking-tight">Mi Simulación (Playoffs)</h1>
               <p className="text-muted-foreground mt-1">
-                Así quedarían los grupos y el cuadro de 16avos <strong>si todos tus pronósticos se cumplen</strong>.
+                Así avanzaría tu cuadro de playoffs <strong>si todos tus pronósticos del Fixture se cumplen</strong>.
               </p>
             </div>
           </div>
@@ -89,27 +89,27 @@ export default async function MiSimulacionPage() {
 
         {/* Coverage indicator */}
         <div className={`rounded-xl p-4 flex items-start gap-3 border ${
-          predictedMatchCount === totalGroupMatches
+          predictedMatchCount === totalPlayoffMatches
             ? 'bg-primary/5 border-primary/20 text-primary'
             : predictedMatchCount === 0
             ? 'bg-destructive/10 border-destructive/20 text-destructive'
             : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
         }`}>
-          {predictedMatchCount < totalGroupMatches && (
+          {predictedMatchCount < totalPlayoffMatches && (
             <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
           )}
           <div>
             <p className="font-bold text-sm">
               {predictedMatchCount === 0
-                ? 'No cargaste ningún pronóstico de grupos todavía.'
-                : predictedMatchCount === totalGroupMatches
-                ? `Pronósticos completos — los ${totalGroupMatches} partidos de grupos están simulados.`
-                : `Simulación parcial: ${predictedMatchCount} de ${totalGroupMatches} partidos pronosticados.`
+                ? 'No cargaste ningún pronóstico de eliminatorias todavía.'
+                : predictedMatchCount === totalPlayoffMatches
+                ? `Pronósticos completos — los ${totalPlayoffMatches} partidos de fase eliminatoria están simulados.`
+                : `Simulación parcial: ${predictedMatchCount} de ${totalPlayoffMatches} partidos pronosticados.`
               }
             </p>
-            {predictedMatchCount < totalGroupMatches && predictedMatchCount > 0 && (
+            {predictedMatchCount < totalPlayoffMatches && predictedMatchCount > 0 && (
               <p className="text-xs mt-1 opacity-80">
-                Los partidos sin pronóstico usan el resultado real si está disponible, o no se contabilizan.
+                Los partidos sin pronóstico usan el resultado real si está disponible, o no se contabilizan para la siguiente llave.
               </p>
             )}
             {predictedMatchCount === 0 && (
@@ -120,33 +120,13 @@ export default async function MiSimulacionPage() {
           </div>
         </div>
 
-        {/* Simulated Group Tables */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-black tracking-tight">Posiciones Simuladas</h2>
-          <p className="text-sm text-muted-foreground -mt-2">
-            <span className="inline-block w-3 h-3 rounded-sm bg-primary/20 border border-primary/40 mr-1.5 align-middle" />
-            Clasifica directo (1° y 2°) &nbsp;
-            <span className="inline-block w-3 h-3 rounded-sm bg-amber-500/20 border border-amber-500/40 mr-1.5 align-middle" />
-            Posible mejor 3°
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {groups.map(group => (
-              <SimulatedGroupTable
-                key={group.group_name}
-                group={group}
-                qualifyingThirdIds={thirdsRanked.slice(0, 8).map(t => t.team_id)}
-              />
-            ))}
-          </div>
-        </section>
-
         {/* Simulated Bracket */}
         <section className="space-y-4 pt-4 border-t border-border/50">
           <div>
-            <h2 className="text-xl font-black tracking-tight">Cuadro de 16avos — Simulado</h2>
+            <h2 className="text-xl font-black tracking-tight">Cuadro de Playoffs Simulado</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Basado en tus pronósticos de fase de grupos. Los equipos en{' '}
-              <span className="text-primary font-bold">verde</span> son los que clasificarían según tu simulación.
+              Los equipos en{' '}
+              <span className="text-primary font-bold">verde</span> son los que avanzarían gracias a tu predicción (o a que acertaste al ganador real).
             </p>
           </div>
           <SimulatedBracket qualifierMap={qualifierMap} />

@@ -54,7 +54,7 @@ function TeamRow({
   code: string;
   qualifierMap: Map<string, QualifierEntry>;
 }) {
-  const qualifier = IS_R32_CODE(code) ? qualifierMap.get(code) : null;
+  const qualifier = qualifierMap.get(code);
 
   if (qualifier) {
     return (
@@ -79,11 +79,6 @@ function TeamRow({
   );
 }
 
-// A code is "resolvable" (1A, 2B, 3ABCDF...) only for R32 matches
-function IS_R32_CODE(code: string): boolean {
-  return /^[123][A-L]/.test(code) || /^3[A-L]{2,}/.test(code);
-}
-
 function MatchNode({
   matchId,
   qualifierMap,
@@ -95,6 +90,8 @@ function MatchNode({
 
   const ph = PLACEHOLDERS[matchId] || { home: 'TBD', away: 'TBD' };
   const is32 = IS_R32(matchId);
+  const homeCode = is32 ? `${matchId}-home` : ph.home;
+  const awayCode = is32 ? `${matchId}-away` : ph.away;
 
   return (
     <div
@@ -105,26 +102,26 @@ function MatchNode({
       <div className="bg-muted/40 px-2 py-1 border-b border-border/40 flex items-center justify-between">
         <span className="text-[9px] text-muted-foreground font-medium">M{matchId}</span>
         {is32 && (
-          <span className="text-[8px] font-bold text-primary/60 uppercase tracking-wide">simulado</span>
+          <span className="text-[8px] font-bold text-primary/60 uppercase tracking-wide">16avos</span>
         )}
       </div>
       <div className="flex flex-col divide-y divide-border/20">
-        <TeamRow code={ph.home} qualifierMap={qualifierMap} />
-        <TeamRow code={ph.away} qualifierMap={qualifierMap} />
+        <TeamRow code={homeCode} qualifierMap={qualifierMap} />
+        <TeamRow code={awayCode} qualifierMap={qualifierMap} />
       </div>
     </div>
   );
 }
 
 export function SimulatedBracket({ qualifierMap }: Props) {
-  const left16  = [73, 75, 74, 77, 76, 78, 79, 80];
-  const right16 = [81, 82, 83, 84, 85, 87, 86, 88];
-  const left8   = [90, 89, 91, 92];
-  const right8  = [94, 93, 96, 95];
-  const left4   = [97, 99];
-  const right4  = [98, 100];
-  const left2   = [101];
-  const right2  = [102];
+  const left16 = [74, 77, 73, 75, 83, 84, 81, 82];
+  const right16 = [76, 78, 79, 80, 86, 88, 85, 87];
+  const left8 = [89, 90, 93, 94];
+  const right8 = [91, 92, 95, 96];
+  const left4 = [97, 98];
+  const right4 = [99, 100];
+  const left2 = [101];
+  const right2 = [102];
 
   return (
     <div className="w-full bg-card border border-border/50 rounded-2xl shadow-sm p-4 md:p-6 overflow-hidden flex flex-col">
