@@ -124,8 +124,14 @@ export async function GET(request: Request) {
 
         let mappedStatus = 'pending';
         if (game.status.name === 'Prog.') mappedStatus = 'pending';
-        else if (game.status.name === 'Fin' || game.status.name === 'Fin Pen.' || game.status.name === 'Finalizado') mappedStatus = 'finished';
+        else if (game.status.enum === 3 || game.status.name === 'Fin' || game.status.name === 'Fin Pen.' || game.status.name === 'Finalizado' || game.status.name === 'Por penales') mappedStatus = 'finished';
         else mappedStatus = 'in_play';
+
+        let winnerByPenaltiesTeamId = null;
+        if (mappedStatus === 'finished' && game.penalties && game.penalties.length === 2) {
+           if (game.winner === 1) winnerByPenaltiesTeamId = homeTeamId;
+           else if (game.winner === 2) winnerByPenaltiesTeamId = awayTeamId;
+        }
 
         const updateData: any = {
           status: mappedStatus,
@@ -134,6 +140,7 @@ export async function GET(request: Request) {
           promiedos_id: game.id // Keep promiedos_id synced
         };
         
+        if (winnerByPenaltiesTeamId) updateData.winner_by_penalties_team_id = winnerByPenaltiesTeamId;
         if (homeTeamId) updateData.home_team_id = homeTeamId;
         if (awayTeamId) updateData.away_team_id = awayTeamId;
 
