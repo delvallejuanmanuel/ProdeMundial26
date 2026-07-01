@@ -64,6 +64,7 @@ export async function updateMatchAction(
 
   if (status === 'finished') {
     await checkAndAdvanceGroup(matchId);
+    await checkAndAdvancePlayoff(matchId);
   }
 
   return { success: true };
@@ -130,6 +131,64 @@ async function checkAndAdvanceGroup(matchId: number) {
   await supabaseAdmin.from('matches').update({
     [map.second.position === 'home' ? 'home_team_id' : 'away_team_id']: secondPlaceId
   }).eq('id', map.second.matchId);
+}
+
+const PLAYOFF_DEPENDENCIES = [
+  // Octavos
+  { id: 89, h: 74, a: 77 }, { id: 90, h: 73, a: 75 }, { id: 91, h: 76, a: 78 }, { id: 92, h: 79, a: 80 },
+  { id: 93, h: 83, a: 84 }, { id: 94, h: 81, a: 82 }, { id: 95, h: 86, a: 88 }, { id: 96, h: 85, a: 87 },
+  // Cuartos
+  { id: 97, h: 89, a: 90 }, { id: 98, h: 93, a: 94 }, { id: 99, h: 91, a: 92 }, { id: 100, h: 95, a: 96 },
+  // Semis
+  { id: 101, h: 97, a: 98 }, { id: 102, h: 99, a: 100 },
+  // Final
+  { id: 104, h: 101, a: 102 },
+  // Tercer Puesto (Losers of Semis)
+  { id: 103, h: -101, a: -102 } // Negative denotes loser
+];
+
+export async function checkAndAdvancePlayoff(matchId: number) {
+  const supabaseAdmin = getAdminClient();
+
+  // 1. Check if match is playoff and get results
+  const { data: match } = await supabaseAdmin.from('matches').select('*').eq('id', matchId).single();
+  if (!match || match.status !== 'finished' || match.phase.toLowerCase().startsWith('grupo')) return;
+
+  // 2. Determine winner and loser
+  let winnerId: number | null = null;
+  let loserId: number | null = null;
+
+  if (match.winner_by_penalties_team_id) {
+    winnerId = match.winner_by_penalties_team_id;
+    loserId = match.home_team_id === winnerId ? match.away_team_id : match.home_team_id;
+  } else if (match.home_score !== null && match.away_score !== null) {
+    if (match.home_score > match.away_score) {
+      winnerId = match.home_team_id;
+      loserId = match.away_team_id;
+    } else if (match.away_score > match.home_score) {
+      winnerId = match.away_team_id;
+      loserId = match.home_team_id;
+    }
+  }
+
+  if (!winnerId) return;
+
+  // 3. Find dependencies and update future matches
+  for (const dep of PLAYOFF_DEPENDENCIES) {
+    // Winner logic
+    if (dep.h === matchId) {
+      await supabaseAdmin.from('matches').update({ home_team_id: winnerId }).eq('id', dep.id);
+    } else if (dep.a === matchId) {
+      await supabaseAdmin.from('matches').update({ away_team_id: winnerId }).eq('id', dep.id);
+    }
+
+    // Loser logic (e.g. for Third Place match)
+    if (dep.h === -matchId && loserId) {
+      await supabaseAdmin.from('matches').update({ home_team_id: loserId }).eq('id', dep.id);
+    } else if (dep.a === -matchId && loserId) {
+      await supabaseAdmin.from('matches').update({ away_team_id: loserId }).eq('id', dep.id);
+    }
+  }
 }
 
 export async function updateMatchTeamsAction(

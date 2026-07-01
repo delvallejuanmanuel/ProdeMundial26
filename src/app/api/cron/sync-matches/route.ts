@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/mailer';
+import { checkAndAdvancePlayoff } from '@/app/admin/actions';
 
 export async function GET(request: Request) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
@@ -186,6 +187,14 @@ export async function GET(request: Request) {
             .from('matches')
             .update(updateData)
             .eq('id', matchInDb.id);
+            
+          if (mappedStatus === 'finished' && matchInDb.phase && !matchInDb.phase.toLowerCase().startsWith('grupo')) {
+             try {
+                await checkAndAdvancePlayoff(matchInDb.id);
+             } catch (e) {
+                console.error('Error advancing playoff match ' + matchInDb.id, e);
+             }
+          }
             
           matchesCount++;
         }
